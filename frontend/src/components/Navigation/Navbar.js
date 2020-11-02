@@ -21,6 +21,7 @@ import Hidden from "@material-ui/core/Hidden";
 import {useHistory} from "react-router";
 import {AccountCircle, LockOpen} from "@material-ui/icons";
 import {Login} from "../authentication/Login";
+import {SignUp} from "../authentication/SignUp";
 
 const drawerWidth = 240;
 
@@ -59,6 +60,7 @@ const useStyles = makeStyles((theme) => ({
     drawer: {
         width: drawerWidth,
         flexShrink: 0,
+        boxShadow: theme.transitions.boxShadow,
     },
     drawerPaper: {
         width: drawerWidth,
@@ -79,7 +81,7 @@ export default function Navbar() {
     const history = useHistory();
     const [open, setOpen] = React.useState(false);
     const [login, setLogin] = React.useState(false);
-    const [signUn, setSignUp] = React.useState(false);
+    const [signUp, setSignUp] = React.useState(false);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -158,6 +160,7 @@ export default function Navbar() {
                 </Toolbar>
             </AppBar>
             <Login open={login} setOpen={setLogin}/>
+            <SignUp open={signUp} setOpen={setSignUp}/>
         </>
     );
 }
