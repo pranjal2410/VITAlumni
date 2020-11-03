@@ -118,7 +118,7 @@ export default function Navbar() {
                 setTab(2);
                 break;
             default:
-                setTab(0);
+                setTab(-1);
         }
     }, [location, login, signUp, logout])
 
