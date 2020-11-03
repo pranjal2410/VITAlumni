@@ -14,7 +14,6 @@ class BranchListView(APIView):
         branches = Branch.objects.all()
         serializer = BranchSerializer(branches, many=True)
         serialized_branches = serializer.data
-
         context = {
             'branches': serialized_branches,
             'success': True
