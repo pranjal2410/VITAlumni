@@ -4,6 +4,8 @@ from .models import *
 
 # Register your models here.
 admin.site.register(Year)
+admin.site.register(Staff)
+admin.site.register(Alumni)
 
 
 @admin.register(Branch)
