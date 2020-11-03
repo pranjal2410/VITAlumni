@@ -4,11 +4,34 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter} from "react-router-dom";
+import {createMuiTheme, CssBaseline, ThemeProvider} from "@material-ui/core";
+import {blue, red} from "@material-ui/core/colors";
+import {SnackbarProvider} from "notistack";
+
+const theme = createMuiTheme({
+    palette: {
+        type: 'dark',
+        primary: {
+            main: blue[300]
+        },
+        secondary: {
+            main: red[300]
+        },
+        error: {
+            main: red[200]
+        }
+    }
+})
 
 ReactDOM.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>,
+    <ThemeProvider theme={theme}>
+        <SnackbarProvider>
+            <CssBaseline/>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
+        </SnackbarProvider>
+    </ThemeProvider>,
   document.getElementById('root')
 );
 

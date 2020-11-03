@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -16,16 +16,12 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-
-function createData(branch, total_passed, registered_passed, total_staff, registered_staff) {
-    return { branch, total_passed, registered_passed, total_staff, registered_staff };
-}
+import {useLocation} from "react-router";
+import axios from "axios";
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -36,10 +32,6 @@ function descendingComparator(a, b, orderBy) {
     }
     return 0;
 }
-
-const rows = [
-    createData('Computer', 50, 40, 20, 3)
-]
 
 function getComparator(order, orderBy) {
     return order === 'desc'
@@ -58,11 +50,11 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-    { id: 'Branch', numeric: false, disablePadding: false, label: 'Branch' },
-    { id: 'Total Pass-outs', numeric: true, disablePadding: true, label: 'Total Pass-outs' },
-    { id: 'Registered Alumni', numeric: true, disablePadding: false, label: 'Registered Alumni' },
-    { id: 'Total staff', numeric: true, disablePadding: false, label: 'Total staff' },
-    { id: 'Registered staff', numeric: true, disablePadding: false, label: 'Registered staff' },
+    { id: 'name', numeric: false, disablePadding: false, label: 'Branch' },
+    { id: 'total_passed', numeric: true, disablePadding: true, label: 'Total Pass-outs' },
+    { id: 'registered_passed', numeric: true, disablePadding: false, label: 'Registered Alumni' },
+    { id: 'total_staff', numeric: true, disablePadding: false, label: 'Total staff' },
+    { id: 'registered_staff', numeric: true, disablePadding: false, label: 'Registered staff' },
 ];
 
 function EnhancedTableHead(props) {
@@ -202,12 +194,14 @@ EnhancedTableToolbar.propTypes = {
 const useStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
-        padding: "20px"
+        padding: "20px",
+        marginTop: theme.spacing(2)
     },
     paper: {
-        width: '100%',
+        width: '75%',
         marginBottom: theme.spacing(2),
-        margin: "auto"
+        margin: "auto",
+        boxShadow: '15px',
     },
     table: {
         minWidth: 750,
@@ -227,11 +221,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Sections() {
     const classes = useStyles();
+    const location = useLocation();
+    const [rows, setRows] = React.useState([]);
     const [order, setOrder] = React.useState('asc');
-    const [orderBy, setOrderBy] = React.useState('calories');
+    const [orderBy, setOrderBy] = React.useState('Total Pass-outs');
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
-    const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
     const handleRequestSort = (event, property) => {
@@ -242,7 +237,7 @@ export default function Sections() {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.branch);
+            const newSelecteds = rows.map((n) => n.name);
             setSelected(newSelecteds);
             return;
         }
@@ -278,9 +273,18 @@ export default function Sections() {
         setPage(0);
     };
 
-    const handleChangeDense = (event) => {
-        setDense(event.target.checked);
-    };
+    useEffect(() => {
+        axios({
+            method: "GET",
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type" : "application/json"
+            },
+            url: '/portal/branch-list/',
+        }).then(response => {
+            setRows(response.data.branches);
+        })
+    }, [location])
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
@@ -288,13 +292,13 @@ export default function Sections() {
 
     return (
         <div className={classes.root}>
-            <Paper className={classes.paper}>
+            <Paper className={classes.paper} elevation={15}>
                 <EnhancedTableToolbar numSelected={selected.length} />
                 <TableContainer>
                     <Table
                         className={classes.table}
                         aria-labelledby="tableTitle"
-                        size={dense ? 'small' : 'medium'}
+                        size={'medium'}
                         aria-label="enhanced table"
                     >
                         <EnhancedTableHead
@@ -310,17 +314,17 @@ export default function Sections() {
                             {stableSort(rows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
-                                    const isItemSelected = isSelected(row.branch);
+                                    const isItemSelected = isSelected(row.name);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
                                         <TableRow
                                             hover
-                                            onClick={(event) => handleClick(event, row.branch)}
+                                            onClick={(event) => handleClick(event, row.name)}
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
-                                            key={row.branch}
+                                            key={row.name}
                                             selected={isItemSelected}
                                         >
                                             <TableCell padding="checkbox">
@@ -330,7 +334,7 @@ export default function Sections() {
                                                 />
                                             </TableCell>
                                             <TableCell component="th" id={labelId} scope="row" padding="none">
-                                                {row.branch}
+                                                {row.name}
                                             </TableCell>
                                             <TableCell align="right">{row.total_passed}</TableCell>
                                             <TableCell align="right">{row.registered_passed}</TableCell>
@@ -340,7 +344,7 @@ export default function Sections() {
                                     );
                                 })}
                             {emptyRows > 0 && (
-                                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
+                                <TableRow style={{ height: 53 * emptyRows }}>
                                     <TableCell colSpan={6} />
                                 </TableRow>
                             )}
@@ -357,10 +361,6 @@ export default function Sections() {
                     onChangeRowsPerPage={handleChangeRowsPerPage}
                 />
             </Paper>
-            <FormControlLabel
-                control={<Switch checked={dense} onChange={handleChangeDense} />}
-                label="Dense padding"
-            />
         </div>
     );
 }

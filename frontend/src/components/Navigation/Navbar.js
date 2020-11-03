@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -18,10 +18,13 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import {useTheme} from "@material-ui/core";
 import Hidden from "@material-ui/core/Hidden";
-import {useHistory} from "react-router";
-import {AccountCircle, LockOpen} from "@material-ui/icons";
+import {useHistory, useLocation} from "react-router";
+import {AccountCircle, ExitToApp, LockOpen} from "@material-ui/icons";
 import {Login} from "../authentication/Login";
 import {SignUp} from "../authentication/SignUp";
+import {getToken} from "../authentication/cookies";
+import {Logout} from "../authentication/Logout";
+import {Backdrop} from "@material-ui/core";
 
 const drawerWidth = 240;
 
@@ -60,17 +63,21 @@ const useStyles = makeStyles((theme) => ({
     drawer: {
         width: drawerWidth,
         flexShrink: 0,
-        boxShadow: theme.transitions.boxShadow,
     },
     drawerPaper: {
         width: drawerWidth,
+        boxShadow: "10",
     },
     drawerHeader: {
         display: 'flex',
         alignItems: 'center',
         padding: theme.spacing(0, 1),
         // necessary for content to be below app bar
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-end'
+    },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
     },
 }));
 
@@ -82,6 +89,9 @@ export default function Navbar() {
     const [open, setOpen] = React.useState(false);
     const [login, setLogin] = React.useState(false);
     const [signUp, setSignUp] = React.useState(false);
+    const [loggedIn, setLoggedIn] = React.useState(false);
+    const [logout, setLogout] = React.useState(false);
+    const location = useLocation();
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -90,6 +100,27 @@ export default function Navbar() {
     const handleDrawerClose = () => {
         setOpen(false);
     };
+
+    useEffect(() => {
+        let token = getToken();
+        if(token !== '') {
+            setLoggedIn(true);
+        }
+        const path = location.pathname;
+        switch (path) {
+            case '/':
+                setTab(0);
+                break;
+            case '/sections':
+                setTab(1);
+                break;
+            case '/about':
+                setTab(2);
+                break;
+            default:
+                setTab(0);
+        }
+    }, [location, login, signUp, logout])
 
     const handleTabChange = (event, newTab) => {
         setTab(newTab);
@@ -130,37 +161,50 @@ export default function Navbar() {
                             <Tab label="About Us" />
                         </Tabs>
                     </Hidden>
-                    <Drawer
-                        className={classes.drawer}
-                        variant="persistent"
-                        anchor="left"
-                        open={open}
-                        classes={{
-                            paper: classes.drawerPaper,
-                        }}
-                    >
-                        <div className={classes.drawerHeader}>
-                            <IconButton onClick={handleDrawerClose}>
-                                {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-                            </IconButton>
-                        </div>
-                        <Divider />
-                        <List>
-                            <ListItem button key={'Login'} onClick={() => setLogin(true)}>
-                                <ListItemIcon><LockOpen /></ListItemIcon>
-                                <ListItemText primary={'Login'} />
-                            </ListItem>
-                            <ListItem button key={'SignUp'} onClick={() => setSignUp(true)}>
-                                <ListItemIcon><AccountCircle /></ListItemIcon>
-                                <ListItemText primary={'Sign Up'} />
-                            </ListItem>
-                        </List>
-                        <Divider />
-                    </Drawer>
+                    <Backdrop open={open} className={classes.backdrop}>
+                        <Drawer
+                            className={classes.drawer}
+                            variant="persistent"
+                            anchor="left"
+                            open={open}
+                            classes={{
+                                paper: classes.drawerPaper,
+                            }}
+                        >
+                            <div className={classes.drawerHeader}>
+                                <Typography variant='h6' color={theme.palette.text.primary} style={{ marginRight: theme.spacing(6)}}>Drawer</Typography>
+                                <IconButton onClick={handleDrawerClose}>
+                                    {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                                </IconButton>
+                            </div>
+                            <Divider />
+                            <List>
+                                {!loggedIn?(
+                                    <>
+                                        <ListItem button key={'Login'} onClick={() => setLogin(true)}>
+                                            <ListItemIcon><LockOpen /></ListItemIcon>
+                                            <ListItemText primary={'Login'} />
+                                        </ListItem>
+                                        <ListItem button key={'SignUp'} onClick={() => setSignUp(true)}>
+                                            <ListItemIcon><AccountCircle /></ListItemIcon>
+                                            <ListItemText primary={'Sign Up'} />
+                                        </ListItem>
+                                    </>
+                                ):(
+                                    <ListItem button key={'Logout'} onClick={() => setLogout(true)}>
+                                        <ListItemIcon><ExitToApp/></ListItemIcon>
+                                        <ListItemText primary={'Logout'} />
+                                    </ListItem>
+                                )}
+                            </List>
+                            <Divider />
+                        </Drawer>
+                    </Backdrop>
                 </Toolbar>
             </AppBar>
             <Login open={login} setOpen={setLogin}/>
             <SignUp open={signUp} setOpen={setSignUp}/>
+            <Logout open={logout} setOpen={setLogout} setLoggedIn={setLoggedIn}/>
         </>
     );
 }

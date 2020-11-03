@@ -2,17 +2,16 @@ import React, {useState} from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
-import MomentUtils from '@date-io/moment';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from "@material-ui/core/IconButton";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
-import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import axios from "axios";
+import { useSnackbar } from "notistack";
+import {setCookie} from "./cookies";
 
 export const SignUp = ({ open, setOpen }) => {
-    const [fromDate, handleFromDate] = useState(new Date());
-    const [toDate, handleToDate] = useState(new Date());
     const [values, setValues] = useState({
         first_name: null,
         last_name: null,
@@ -20,8 +19,16 @@ export const SignUp = ({ open, setOpen }) => {
         password: null,
         confirmPassword: null,
         contact: null,
-        branch: null,
     });
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const [errors, setErrors] = useState({
+        nameError: false,
+        contactError: false,
+        emailError: false,
+        passwordError: false,
+        confirmPasswordError: false,
+        signUpError: false,
+    })
     const [visible, setVisible] = useState(false);
 
     const handleClose = () => {
@@ -36,8 +43,57 @@ export const SignUp = ({ open, setOpen }) => {
     }
 
     const handleSubmit = () => {
-        console.log(values, fromDate, toDate);
-        setOpen(false);
+        if (values.first_name === null || values.first_name === '' || values.last_name === null || values.last_name === '') {
+            setErrors({...errors, nameError: true})
+            return;
+        }
+        if (values.contact === null || values.contact === '') {
+            setErrors({...errors, contactError: true})
+            return;
+        }
+        if (values.email === null || values.email === '') {
+            setErrors({...errors, emailError: true})
+            return;
+        }
+        if (values.password === null || values.password === '') {
+            setErrors({...errors, passwordError: true})
+            return;
+        }
+        if (values.confirmPassword !== values.password) {
+            setErrors({...errors, confirmPasswordError: true})
+            return;
+        }
+        if(!(errors.passwordError || errors.emailError || errors.confirmPasswordError || errors.nameError || errors.emailError))
+        {
+            enqueueSnackbar('Sending data....', {variant: "info", key: 'try_signUp'})
+            axios({
+                method: 'POST',
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Type" : "application/json"
+                },
+                data: {
+                    first_name: values.first_name,
+                    last_name: values.last_name,
+                    contact: values.contact,
+                    email: values.email,
+                    password: values.password
+                },
+                url: '/auth/register/'
+            }).then(response => {
+                closeSnackbar('try_signUp')
+                setCookie(response.data.token);
+                setErrors({...errors, signUpError: false});
+                setOpen(false);
+                enqueueSnackbar('Signed Up Successfully!', { variant: 'success', key: 'signUp_success'})
+                setTimeout(() => closeSnackbar('signUp_success'), 5000)
+            }).catch(error => {
+                closeSnackbar('try_signUp')
+                setErrors({...errors, signUpError: true});
+                enqueueSnackbar('Failed to Register', { variant: 'error', key: 'signUp_error'})
+                setTimeout(() => closeSnackbar('signUp_error'), 5000)
+            })
+        }
     }
 
     return (
@@ -52,6 +108,8 @@ export const SignUp = ({ open, setOpen }) => {
                         type="text"
                         name="first_name"
                         margin="normal"
+                        error={errors.nameError || errors.signUpError}
+                        helperText={errors.nameError?"Enter a valid name":errors.signUpError?"Invalid credentials":null}
                         onChange={handleChange}
                         autoFocus
                         required
@@ -64,6 +122,8 @@ export const SignUp = ({ open, setOpen }) => {
                         name="last_name"
                         margin="normal"
                         onChange={handleChange}
+                        error={errors.nameError || errors.signUpError}
+                        helperText={errors.nameError?"Enter a valid name":errors.signUpError?"Invalid credentials":null}
                         autoFocus
                         style={{ marginLeft: "20px" }}
                         required
@@ -76,6 +136,7 @@ export const SignUp = ({ open, setOpen }) => {
                         name="email"
                         margin="normal"
                         onChange={handleChange}
+                        helperText={errors.emailError?"Enter a valid email address":errors.signUpError?"Invalid credentials":null}
                         fullWidth
                         autoFocus
                         required
@@ -87,20 +148,10 @@ export const SignUp = ({ open, setOpen }) => {
                         type="number"
                         name="contact"
                         margin="normal"
+                        error={errors.contactError || errors.signUpError}
+                        helperText={errors.contactError?"Enter a valid contact":errors.signUpError?"Invalid credentials":null}
                         onChange={handleChange}
                         autoFocus
-                        required
-                    />
-                    <TextField
-                        id="branch"
-                        variant="outlined"
-                        label="Branch Name"
-                        type="text"
-                        name="branch"
-                        margin="normal"
-                        onChange={handleChange}
-                        autoFocus
-                        style={{ marginLeft: "20px" }}
                         required
                     />
                     <TextField
@@ -109,6 +160,8 @@ export const SignUp = ({ open, setOpen }) => {
                         label="Password"
                         margin="normal"
                         type={visible? "text":"password"}
+                        error={errors.passwordError || errors.signUpError}
+                        helperText={errors.passwordError?"Enter a valid password":errors.signUpError?"Invalid credentials":null}
                         name="password"
                         onChange={handleChange}
                         InputProps={{
@@ -125,12 +178,14 @@ export const SignUp = ({ open, setOpen }) => {
                         required
                     />
                     <TextField
-                        id="confirm_password"
+                        id="confirmPassword"
                         variant="outlined"
                         label="Confirm Password"
                         margin="normal"
                         type={visible? "text":"password"}
-                        name="confirm_password"
+                        name="confirmPassword"
+                        error={errors.confirmPasswordError || errors.signUpError}
+                        helperText={errors.confirmPasswordError?"Passwords do not match!":errors.signUpError?"Invalid credentials":null}
                         onChange={handleChange}
                         InputProps={{
                             endAdornment:
@@ -145,27 +200,6 @@ export const SignUp = ({ open, setOpen }) => {
                         autoFocus
                         required
                     />
-                    <MuiPickersUtilsProvider utils={MomentUtils}>
-                        <DatePicker
-                            views={["year", "month"]}
-                            label="From"
-                            helperText="Academic year start"
-                            value={fromDate}
-                            onChange={handleFromDate}
-                            color={'primary'}
-                            margin="normal"
-                        />
-                        <DatePicker
-                            views={["year", "month"]}
-                            label="End"
-                            helperText="Academic year end"
-                            value={toDate}
-                            onChange={handleToDate}
-                            color={'primary'}
-                            margin="normal"
-                            style={{ marginLeft: "20px" }}
-                        />
-                    </MuiPickersUtilsProvider>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
