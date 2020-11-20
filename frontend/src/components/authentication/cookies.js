@@ -14,11 +14,11 @@ export const getCookie = (cname) => {
     return "";
 }
 
-export const setCookie = (cvalue) => {
+export const setCookie = (cvalue, cname) => {
     let d = new Date();
     d.setTime(d.getTime() + 60 * 60 * 1000);
     let expires = "expires="+d.toUTCString();
-    document.cookie = "token=" + cvalue + ";" + expires + ";path=/";
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
 export const getToken = () => {

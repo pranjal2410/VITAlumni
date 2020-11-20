@@ -22,9 +22,10 @@ import {useHistory, useLocation} from "react-router";
 import {AccountCircle, ExitToApp, LockOpen} from "@material-ui/icons";
 import {Login} from "../authentication/Login";
 import {SignUp} from "../authentication/SignUp";
-import {getToken} from "../authentication/cookies";
+import {getCookie, getToken} from "../authentication/cookies";
 import {Logout} from "../authentication/Logout";
 import {Backdrop} from "@material-ui/core";
+import {OTP} from "../authentication/OTP";
 
 const drawerWidth = 240;
 
@@ -91,6 +92,7 @@ export default function Navbar() {
     const [signUp, setSignUp] = React.useState(false);
     const [loggedIn, setLoggedIn] = React.useState(false);
     const [logout, setLogout] = React.useState(false);
+    const [otp, setOTP] = React.useState(false);
     const location = useLocation();
 
     const handleDrawerOpen = () => {
@@ -105,6 +107,10 @@ export default function Navbar() {
         let token = getToken();
         if(token !== '') {
             setLoggedIn(true);
+            if(getCookie('verification'))
+            {
+                setOTP(true);
+            }
         }
         const path = location.pathname;
         switch (path) {
@@ -117,6 +123,18 @@ export default function Navbar() {
             case '/about':
                 setTab(2);
                 break;
+            case '/feed':
+                if(!getToken())
+                    setTab(1);
+                else
+                    setTab(3);
+                break;
+            case '/search':
+                if(!getToken())
+                    setTab(1);
+                else
+                    setTab(4);
+                break;
             default:
                 setTab(-1);
         }
@@ -126,16 +144,22 @@ export default function Navbar() {
         setTab(newTab);
         switch(newTab) {
             case 0:
-                history.push('/')
+                history.push('/');
                 break;
             case 1:
-                history.push('/sections')
+                history.push('/sections');
                 break;
             case 2:
-                history.push('/about')
+                history.push('/about');
+                break;
+            case 3:
+                history.push('/feed');
+                break;
+            case 4:
+                history.push('/search');
                 break;
             default:
-                history.push('/')
+                history.push('/');
         }
     };
 
@@ -159,6 +183,12 @@ export default function Navbar() {
                             <Tab label="Home" />
                             <Tab label="Sections" />
                             <Tab label="About Us" />
+                            {loggedIn?(
+                                <Tab label="Feed" />
+                            ):null}
+                            {loggedIn?(
+                                <Tab label="Search" />
+                            ):null}
                         </Tabs>
                     </Hidden>
                     <Backdrop open={open} className={classes.backdrop}>
@@ -172,7 +202,7 @@ export default function Navbar() {
                             }}
                         >
                             <div className={classes.drawerHeader}>
-                                <Typography variant='h6' color={theme.palette.text.primary} style={{ marginRight: theme.spacing(6)}}>Drawer</Typography>
+                                <Typography variant='h6' style={{ marginRight: theme.spacing(6), color: theme.palette.text.primary }}>Drawer</Typography>
                                 <IconButton onClick={handleDrawerClose}>
                                     {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                                 </IconButton>
@@ -191,10 +221,12 @@ export default function Navbar() {
                                         </ListItem>
                                     </>
                                 ):(
-                                    <ListItem button key={'Logout'} onClick={() => setLogout(true)}>
-                                        <ListItemIcon><ExitToApp/></ListItemIcon>
-                                        <ListItemText primary={'Logout'} />
-                                    </ListItem>
+                                    <>
+                                        <ListItem button key={'Logout'} onClick={() => setLogout(true)}>
+                                            <ListItemIcon><ExitToApp/></ListItemIcon>
+                                            <ListItemText primary={'Logout'} />
+                                        </ListItem>
+                                    </>
                                 )}
                             </List>
                             <Divider />
@@ -202,8 +234,9 @@ export default function Navbar() {
                     </Backdrop>
                 </Toolbar>
             </AppBar>
-            <Login open={login} setOpen={setLogin}/>
-            <SignUp open={signUp} setOpen={setSignUp}/>
+            <Login open={login} setOpen={setLogin} setOTP={setOTP}/>
+            <SignUp open={signUp} setOpen={setSignUp} otp={otp} setOTP={setOTP}/>
+            <OTP open={otp} setOpen={setOTP} setLoggedIn={setLoggedIn}/>
             <Logout open={logout} setOpen={setLogout} setLoggedIn={setLoggedIn}/>
         </>
     );

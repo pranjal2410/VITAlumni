@@ -9,9 +9,9 @@ import IconButton from "@material-ui/core/IconButton";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
 import axios from "axios";
 import { useSnackbar } from "notistack";
-import {setCookie} from "./cookies";
+import {getToken, setCookie} from "./cookies";
 
-export const SignUp = ({ open, setOpen }) => {
+export const SignUp = ({ open, setOpen, otp, setOTP }) => {
     const [values, setValues] = useState({
         first_name: null,
         last_name: null,
@@ -82,11 +82,32 @@ export const SignUp = ({ open, setOpen }) => {
                 url: '/auth/register/'
             }).then(response => {
                 closeSnackbar('try_signUp')
-                setCookie(response.data.token);
+                setCookie(response.data.token, 'token');
+                setCookie(response.data.is_otp_verified, 'verification');
                 setErrors({...errors, signUpError: false});
                 setOpen(false);
                 enqueueSnackbar('Signed Up Successfully!', { variant: 'success', key: 'signUp_success'})
-                setTimeout(() => closeSnackbar('signUp_success'), 5000)
+                setTimeout(() => closeSnackbar('signUp_success'), 5000);
+                setOTP(true);
+                setCookie(response.data.is_otp_verified, 'verification')
+                enqueueSnackbar('Sending OTP...', {variant: 'info', key: 'send-otp'})
+                axios({
+                    method: 'GET',
+                    headers: {
+                        "Access-Control-Allow-Origin": "*",
+                        "Content-Type" : "application/json",
+                        "Authorization": `Token ${getToken()}`,
+                    },
+                    url: '/auth/verify-otp/'
+                }).then(response => {
+                    closeSnackbar('send-otp')
+                    enqueueSnackbar('OTP sent to your email Successfully!', {variant: 'success', key: 'success-send'})
+                    setTimeout(() => closeSnackbar('success-resend'), 2000)
+                }).catch(error => {
+                    closeSnackbar('resend')
+                    enqueueSnackbar('Failed to send OTP', {variant: 'error', key: 'fail-send'})
+                    setTimeout(() => closeSnackbar('fail-send'), 2000)
+                })
             }).catch(error => {
                 closeSnackbar('try_signUp')
                 setErrors({...errors, signUpError: true});
