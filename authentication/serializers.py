@@ -32,6 +32,7 @@ class LoginSerializer(serializers.Serializer):
     token = serializers.CharField(max_length=255, read_only=True)
     is_staff = serializers.BooleanField(default=False, read_only=True)
     name = serializers.CharField(max_length=255, read_only=True)
+    is_otp_verified = serializers.BooleanField(default=False)
 
     def validate(self, data):
         email = data.get('email')
@@ -50,5 +51,6 @@ class LoginSerializer(serializers.Serializer):
             'email': user.email,
             'token': token,
             'is_staff': user.is_staff,
-            'name': user.first_name + ' ' + user.last_name
+            'name': user.first_name + ' ' + user.last_name,
+            'is_otp_verified': user.otp_verified
         }

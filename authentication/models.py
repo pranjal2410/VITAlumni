@@ -63,8 +63,9 @@ class User(AbstractBaseUser):
 
 class OTP(models.Model):
     otp = models.IntegerField(default=0)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otp')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='otp')
     created = models.DateTimeField(auto_now_add=True)
+    counter = models.IntegerField(default=0)
 
     @property
     def is_valid(self):

@@ -6,6 +6,7 @@ from .models import *
 admin.site.register(Year)
 admin.site.register(Staff)
 admin.site.register(Alumni)
+admin.site.register(Updates)
 
 
 @admin.register(Branch)
