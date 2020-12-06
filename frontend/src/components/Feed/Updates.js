@@ -30,8 +30,6 @@ import Fab from "@material-ui/core/Fab";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import Checkbox from "@material-ui/core/Checkbox";
 import useTheme from "@material-ui/core/styles/useTheme";
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -109,7 +107,6 @@ const Updates = () => {
         text: '',
         is_profile_pic: false,
     });
-    const [menu, setMenu] = React.useState(null);
 
     React.useEffect(() => {
         axios({
@@ -219,7 +216,7 @@ const Updates = () => {
         }).then(response => {
             setPost({
                 ...post,
-                text: null,
+                text: '',
                 doc: null,
                 photo: null,
                 docFile: null,
@@ -234,6 +231,10 @@ const Updates = () => {
     const handleGreet = i => (e) => {
         let feed_arr = [...feed];
         feed_arr[i].is_greeted = !feed_arr[i].is_greeted;
+        if(feed_arr[i].is_greeted)
+            feed_arr[i].greets += 1;
+        else
+            feed_arr[i].greets -= 1;
         setFeed(feed_arr);
         axios({
             method: 'POST',
@@ -250,14 +251,6 @@ const Updates = () => {
         }).catch(err => {
             console.log(err.response.data)
         })
-    }
-
-    const handleMenu = (e) => {
-        setMenu(e.currentTarget);
-    }
-
-    const handleMenuClose = (e) => {
-        setMenu(null);
     }
 
     return (
@@ -341,25 +334,16 @@ const Updates = () => {
                     const date = new Date(update.created_on);
                     return (
                     <Grid item xs={12} key={i}>
-                        <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={10}>
+                        <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={10} id={'paper'+i}>
                             <CardHeader
                                 avatar={
                                     <Avatar aria-label={update.user} className={classes.avatar} src={update.user_dp} />
                                 }
                                 action={update.by_self?(
                                     <>
-                                        <IconButton aria-label="settings" onClick={handleMenu}>
+                                        <IconButton aria-label="settings">
                                             <MoreVertIcon />
                                         </IconButton>
-                                        <Menu
-                                            id="simple-menu"
-                                            anchorEl={menu}
-                                            keepMounted
-                                            open={Boolean(menu)}
-                                            onClose={handleMenuClose}
-                                        >
-                                            <MenuItem onClick={handleMenuClose}>Delete Update?</MenuItem>
-                                        </Menu>
                                     </>
                                 ):null}
                                 title={update.user}
@@ -390,6 +374,11 @@ const Updates = () => {
                                     {update.is_greeted?('UnGreet'):('Greet')}
                                 </Button>
                             </CardActions>
+                            <CardContent>
+                                <Typography variant="body2" color="textSecondary" component="p">
+                                    {update.greets} people have greeted this.
+                                </Typography>
+                            </CardContent>
                         </Paper>
                     </Grid>)
                 })}

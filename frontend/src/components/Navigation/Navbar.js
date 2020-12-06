@@ -135,6 +135,12 @@ export default function Navbar() {
                 else
                     setTab(4);
                 break;
+            case '/profile':
+                if(!getToken())
+                    setTab(1);
+                else
+                    setTab(5);
+                break;
             default:
                 setTab(-1);
         }
@@ -157,6 +163,9 @@ export default function Navbar() {
                 break;
             case 4:
                 history.push('/search');
+                break;
+            case 5:
+                history.push('/profile');
                 break;
             default:
                 history.push('/');
@@ -188,6 +197,9 @@ export default function Navbar() {
                             ):null}
                             {loggedIn?(
                                 <Tab label="Search" />
+                            ):null}
+                            {loggedIn?(
+                                <Tab label="User Profile" />
                             ):null}
                         </Tabs>
                     </Hidden>
@@ -222,6 +234,10 @@ export default function Navbar() {
                                     </>
                                 ):(
                                     <>
+                                        <ListItem button key={'Profile'} onClick={() => setLogout(true)}>
+                                            <ListItemIcon><ExitToApp/></ListItemIcon>
+                                            <ListItemText primary={'Profile'} />
+                                        </ListItem>
                                         <ListItem button key={'Logout'} onClick={() => setLogout(true)}>
                                             <ListItemIcon><ExitToApp/></ListItemIcon>
                                             <ListItemText primary={'Logout'} />

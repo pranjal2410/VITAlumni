@@ -41,6 +41,9 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     otp_verified = models.BooleanField(default=False)
+    profile_pic = models.OneToOneField('portal.Updates', on_delete=models.SET_NULL, null=True, related_name='DP')
+    cover_pic = models.OneToOneField('portal.Updates', on_delete=models.SET_NULL, null=True,
+                                     related_name='CoverPicture')
 
     USERNAME_FIELD = 'email'
     objects = UserManager()
