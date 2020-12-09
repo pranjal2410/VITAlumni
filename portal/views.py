@@ -28,40 +28,9 @@ class FeedView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        if request.user.is_staff:
-            person = Staff.objects.get(user=request.user)
-        else:
-            person = Alumni.objects.get(user=request.user)
-        greeted_list = person.greeted
-        feed = []
-        updates = Updates.objects.all().order_by('-created_on')
-        for update in updates:
-            update_dict = {'text': update.text}
-            if update.photo != 'null':
-                update_dict['photo'] = update.photo.url
-            if update.doc != 'null':
-                update_dict['doc'] = update.doc.url
-            update_dict['is_profile_pic'] = update.is_profile_pic
-            update_dict['is_cover_pic'] = update.is_cover_pic
-            update_dict['is_job_update'] = update.is_job_update
-            update_dict['created_on'] = update.created_on
-            update_dict['user'] = update.user.first_name + ' ' + update.user.last_name
-            dp_update = Updates.objects.filter(user=update.user, is_profile_pic=True).order_by('-created_on')
-            update_dict['user_dp'] = dp_update.first().photo.url if len(dp_update) > 0 else update.user.first_name[0].upper()
-            update_dict['id'] = update.id
-            update_dict['greets'] = len(update.staff_set.all()) + len(update.alumni_set.all())
-            update_dict['by_self'] = update.user == request.user
-            try:
-                greeted_list.get(id=update.id)
-                update_dict['is_greeted'] = True
-            except Updates.DoesNotExist:
-                update_dict['is_greeted'] = False
-
-            feed.append(update_dict)
-
         context = {
             'success': True,
-            'feed': feed,
+            'feed': getFeed(request.user, True)
         }
 
         return Response(context, status=status.HTTP_200_OK)
@@ -149,5 +118,51 @@ class UserProfileView(APIView):
 
         user_context['is_staff'] = user.is_staff
         user_context['connections'] = len(person.connections.all())
+        user_context['date_joined'] = user.date_registered
 
-        return Response(user_context, status=status.HTTP_200_OK)
+        feed_context = getFeed(user)
+
+        context = {
+            'user_data': user_context,
+            'feed_data': feed_context,
+        }
+        return Response(context, status=status.HTTP_200_OK)
+
+
+def getFeed(user, all_feed=False):
+    if all_feed:
+        updates = Updates.objects.all().order_by('-created_on')
+    else:
+        updates = Updates.objects.filter(user=user).order_by('-created_on')
+    if user.is_staff:
+        person = Staff.objects.get(user=user)
+    else:
+        person = Alumni.objects.get(user=user)
+    greeted_list = person.greeted
+    feed = []
+    for update in updates:
+        update_dict = {'text': update.text}
+        if update.photo != 'null':
+            update_dict['photo'] = update.photo.url
+        if update.doc != 'null':
+            update_dict['doc'] = update.doc.url
+        update_dict['is_profile_pic'] = update.is_profile_pic
+        update_dict['is_cover_pic'] = update.is_cover_pic
+        update_dict['is_job_update'] = update.is_job_update
+        update_dict['created_on'] = update.created_on
+        update_dict['user'] = update.user.first_name + ' ' + update.user.last_name
+        dp_update = Updates.objects.filter(user=update.user, is_profile_pic=True).order_by('-created_on')
+        update_dict['user_dp'] = dp_update.first().photo.url if len(dp_update) > 0 else update.user.first_name[
+            0].upper()
+        update_dict['id'] = update.id
+        update_dict['greets'] = len(update.staff_set.all()) + len(update.alumni_set.all())
+        update_dict['by_self'] = update.user == user
+        try:
+            greeted_list.get(id=update.id)
+            update_dict['is_greeted'] = True
+        except Updates.DoesNotExist:
+            update_dict['is_greeted'] = False
+
+        feed.append(update_dict)
+
+    return feed
