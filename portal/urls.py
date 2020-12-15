@@ -7,4 +7,5 @@ urlpatterns = [
     path('greet/', GreetView.as_view(), name='greet'),
     path('delete-update/', OperateUpdateView.as_view(), name='delete-update'),
     path('user-profile/', UserProfileView.as_view(), name='user-profile'),
+    path('get-pending-list/', PendingView.as_view(), name='pending-list'),
 ]

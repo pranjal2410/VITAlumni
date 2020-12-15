@@ -120,8 +120,9 @@ class PendingView(APIView):
         for pending in Connection.objects.filter(receiver=profile.email, approved=False):
             pending_list.append({
                 'email': pending.sender.email,
-                'name': pending.user.first_name + ' ' + pending.user.last_name,
-                'profile_pic': pending.user.profile_pic.photo.url if pending.user.profile_pic else None
+                'name': pending.sender.user.first_name + ' ' + pending.sender.user.last_name,
+                'profile_pic': pending.sender.user.profile_pic.photo.url if pending.sender.user.profile_pic else None,
+                'approved': pending.approved
             })
         context = {
             'pending_list': pending_list,
@@ -129,6 +130,20 @@ class PendingView(APIView):
         }
 
         return Response(context, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        profile = Profile.objects.get(user=request.user)
+        email = request.data['email']
+        sender = Profile.objects.get(email=email)
+        connection = Connection.objects.get(sender=sender, receiver=profile.email)
+        connection.approved = True
+        connection.save()
+        profile.connections.add(sender)
+        sender.connections.add(profile)
+        sender.save()
+        profile.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def getFeed(user, all_feed=False):
