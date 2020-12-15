@@ -19,13 +19,14 @@ import ListItemText from '@material-ui/core/ListItemText';
 import {useTheme} from "@material-ui/core";
 import Hidden from "@material-ui/core/Hidden";
 import {useHistory, useLocation} from "react-router";
-import {AccountCircle, ExitToApp, LockOpen} from "@material-ui/icons";
+import {AccountCircle, ExitToApp, LockOpen, People} from "@material-ui/icons";
 import {Login} from "../authentication/Login";
 import {SignUp} from "../authentication/SignUp";
 import {getCookie, getToken} from "../authentication/cookies";
 import {Logout} from "../authentication/Logout";
 import {Backdrop} from "@material-ui/core";
 import {OTP} from "../authentication/OTP";
+import {PendingRequests} from "../profile/PendingRequests";
 
 const drawerWidth = 240;
 
@@ -91,6 +92,7 @@ export default function Navbar() {
     const [login, setLogin] = React.useState(false);
     const [signUp, setSignUp] = React.useState(false);
     const [loggedIn, setLoggedIn] = React.useState(false);
+    const [pending, setPending] = React.useState(false);
     const [logout, setLogout] = React.useState(false);
     const [otp, setOTP] = React.useState(false);
     const location = useLocation();
@@ -234,9 +236,9 @@ export default function Navbar() {
                                     </>
                                 ):(
                                     <>
-                                        <ListItem button key={'Profile'} onClick={() => setLogout(true)}>
-                                            <ListItemIcon><ExitToApp/></ListItemIcon>
-                                            <ListItemText primary={'Profile'} />
+                                        <ListItem button key={'Pending List'} onClick={() => setPending(true)}>
+                                            <ListItemIcon><People/></ListItemIcon>
+                                            <ListItemText primary={'Pending Requests'} />
                                         </ListItem>
                                         <ListItem button key={'Logout'} onClick={() => setLogout(true)}>
                                             <ListItemIcon><ExitToApp/></ListItemIcon>
@@ -253,6 +255,7 @@ export default function Navbar() {
             <Login open={login} setOpen={setLogin} setOTP={setOTP}/>
             <SignUp open={signUp} setOpen={setSignUp} otp={otp} setOTP={setOTP}/>
             <OTP open={otp} setOpen={setOTP} setLoggedIn={setLoggedIn}/>
+            <PendingRequests open={pending} setOpen={setPending}/>
             <Logout open={logout} setOpen={setLogout} setLoggedIn={setLoggedIn}/>
         </>
     );
