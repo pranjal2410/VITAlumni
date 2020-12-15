@@ -50,7 +50,6 @@ class LoginSerializer(serializers.Serializer):
         return {
             'email': user.email,
             'token': token,
-            'is_staff': user.is_staff,
             'name': user.first_name + ' ' + user.last_name,
             'is_otp_verified': user.otp_verified
         }

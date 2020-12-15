@@ -17,7 +17,7 @@ const theme = createMuiTheme({
         secondary: {
             main: red[300]
         },
-    }
+    },
 })
 
 ReactDOM.render(

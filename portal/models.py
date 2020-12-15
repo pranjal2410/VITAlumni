@@ -21,24 +21,13 @@ class Branch(models.Model):
         return self.name
 
 
-class Alumni(models.Model):
+class Profile(models.Model):
     user = models.OneToOneField('authentication.User', on_delete=models.CASCADE, related_name='Alumni', null=True)
     email = models.EmailField(unique=True, max_length=100)
     branch = models.ForeignKey(Branch, on_delete=models.DO_NOTHING, null=True)
     year = models.ManyToManyField(Year, verbose_name='Graduation Year')
-    connections = models.ManyToManyField('Alumni', blank=True)
-    staff_connections = models.ManyToManyField('Staff', blank=True)
-    greeted = models.ManyToManyField('Updates', blank=True)
-
-    def __str__(self):
-        return self.email
-
-
-class Staff(models.Model):
-    user = models.OneToOneField('authentication.User', on_delete=models.CASCADE, related_name='Staff', null=True)
-    email = models.EmailField(unique=True, max_length=100)
-    branch = models.ForeignKey(Branch, on_delete=models.DO_NOTHING, null=True)
-    connections = models.ManyToManyField('Staff', blank=True)
+    connections = models.ManyToManyField('self', blank=True)
+    is_college_staff = models.BooleanField(default=False)
     greeted = models.ManyToManyField('Updates', blank=True)
 
     def __str__(self):
@@ -58,3 +47,12 @@ class Updates(models.Model):
 
     def __str__(self):
         return self.user.email + ' ' + self.created_on.__str__()
+
+
+class Connection(models.Model):
+    sender = models.ForeignKey('Profile', on_delete=models.CASCADE, null=True)
+    receiver = models.CharField(max_length=100, null=True)
+    approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.sender.user.email + ' ' + self.receiver + self.approved.__str__()

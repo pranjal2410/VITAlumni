@@ -7,17 +7,20 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import useTheme from "@material-ui/core/styles/useTheme";
 import { useSnackbar } from "notistack";
+import {useHistory} from "react-router";
 
 export const Logout = ({ open, setOpen, setLoggedIn }) => {
     const theme = useTheme();
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+    let history = useHistory();
 
     const handleClose = () => {
         setOpen(false);
     };
 
     const handleSubmit = () => {
-        enqueueSnackbar('Logging out....', {variant: 'info', key: 'logging_out'})
+        enqueueSnackbar('Logging out....', {variant: 'info', key: 'logging_out'});
+        history.push('/');
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         setTimeout(() => closeSnackbar('logging_out'), 3000);
         setTimeout(() => enqueueSnackbar('Logged out Successfully!', {variant: 'success', key: 'logged_out'}), 3000);

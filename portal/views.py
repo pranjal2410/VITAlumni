@@ -30,7 +30,9 @@ class FeedView(APIView):
     def get(self, request):
         context = {
             'success': True,
-            'feed': getFeed(request.user, True)
+            'user_data': getUserProfile(Profile.objects.get(user=request.user)),
+            'feed': getFeed(request.user, True),
+            'connection_list': getConnectionList(Profile.objects.get(user=request.user))
         }
 
         return Response(context, status=status.HTTP_200_OK)
@@ -62,10 +64,7 @@ class GreetView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def post(self, request):
-        if request.user.is_staff:
-            person = Staff.objects.get(user=request.user)
-        else:
-            person = Alumni.objects.get(user=request.user)
+        person = Profile.objects.get(user=request.user)
         update_id = request.data.get('id')
         update = Updates.objects.get(id=update_id)
         try:
@@ -99,26 +98,8 @@ class UserProfileView(APIView):
 
     def get(self, request):
         user = request.user
-        if user.is_staff:
-            person = Staff.objects.get(user=user)
-        else:
-            person = Alumni.objects.get(user=user)
-        try:
-            person_updates = Updates.objects.filter(user=user).order_by('-created_on')
-        except Updates.DoesNotExist:
-            person_updates = []
-        user_context = {'name': user.first_name + ' ' + user.last_name, 'email': user.email}
-        for update in person_updates:
-            if update.is_profile_pic:
-                user_context['profile_pic'] = update.photo.url
-                break
-        for update in person_updates:
-            if update.is_cover_pic:
-                user_context['cover_pic'] = update.photo.url
-
-        user_context['is_staff'] = user.is_staff
-        user_context['connections'] = len(person.connections.all())
-        user_context['date_joined'] = user.date_registered
+        person = Profile.objects.get(user=user)
+        user_context = getUserProfile(person)
 
         feed_context = getFeed(user)
 
@@ -129,15 +110,33 @@ class UserProfileView(APIView):
         return Response(context, status=status.HTTP_200_OK)
 
 
+class PendingView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication, ]
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request):
+        profile = Profile.objects.get(user=request.user)
+        pending_list = []
+        for pending in Connection.objects.filter(receiver=profile.email, approved=False):
+            pending_list.append({
+                'email': pending.sender.email,
+                'name': pending.user.first_name + ' ' + pending.user.last_name,
+                'profile_pic': pending.user.profile_pic.photo.url if pending.user.profile_pic else None
+            })
+        context = {
+            'pending_list': pending_list,
+            'success': True,
+        }
+
+        return Response(context, status=status.HTTP_200_OK)
+
+
 def getFeed(user, all_feed=False):
     if all_feed:
         updates = Updates.objects.all().order_by('-created_on')
     else:
         updates = Updates.objects.filter(user=user).order_by('-created_on')
-    if user.is_staff:
-        person = Staff.objects.get(user=user)
-    else:
-        person = Alumni.objects.get(user=user)
+    person = Profile.objects.get(user=user)
     greeted_list = person.greeted
     feed = []
     for update in updates:
@@ -151,11 +150,10 @@ def getFeed(user, all_feed=False):
         update_dict['is_job_update'] = update.is_job_update
         update_dict['created_on'] = update.created_on
         update_dict['user'] = update.user.first_name + ' ' + update.user.last_name
-        dp_update = Updates.objects.filter(user=update.user, is_profile_pic=True).order_by('-created_on')
-        update_dict['user_dp'] = dp_update.first().photo.url if len(dp_update) > 0 else update.user.first_name[
+        update_dict['user_dp'] = update.user.profile_pic.photo.url if update.user.profile_pic else update.user.first_name[
             0].upper()
         update_dict['id'] = update.id
-        update_dict['greets'] = len(update.staff_set.all()) + len(update.alumni_set.all())
+        update_dict['greets'] = len(update.profile_set.all())
         update_dict['by_self'] = update.user == user
         try:
             greeted_list.get(id=update.id)
@@ -166,3 +164,37 @@ def getFeed(user, all_feed=False):
         feed.append(update_dict)
 
     return feed
+
+
+def getUserProfile(profile):
+    updates = Updates.objects.filter(user=profile.user).order_by('-created_on')
+    user_context = {'name': profile.user.first_name + ' ' + profile.user.last_name, 'email': profile.user.email}
+    for update in updates:
+        if update.is_profile_pic:
+            user_context['profile_pic'] = update.photo.url
+            break
+    if profile.user.profile_pic is not None:
+        user_context['profile_pic'] = profile.user.profile_pic.photo.url
+    if profile.user.cover_pic is not None:
+        user_context['cover_pic'] = profile.user.cover_pic.photo.url
+
+    user_context['is_staff'] = profile.is_college_staff
+    user_context['connections'] = len(profile.connections.all())
+    user_context['date_joined'] = profile.user.date_registered
+    user_context['birthday'] = profile.user.birthday
+    user_context['branch'] = profile.branch
+    user_context['contact'] = profile.user.contact
+
+    return user_context
+
+
+def getConnectionList(profile):
+    connection_list = []
+    for connection in profile.connections.all():
+        connection_list.append({
+            'email': connection.email,
+            'name': connection.user.first_name + ' ' + connection.user.last_name,
+            'profile_pic': connection.user.profile_pic.photo.url if connection.user.profile_pic else None
+        })
+
+    return connection_list

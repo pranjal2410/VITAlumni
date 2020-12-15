@@ -44,6 +44,7 @@ class User(AbstractBaseUser):
     profile_pic = models.OneToOneField('portal.Updates', on_delete=models.SET_NULL, null=True, related_name='DP')
     cover_pic = models.OneToOneField('portal.Updates', on_delete=models.SET_NULL, null=True,
                                      related_name='CoverPicture')
+    birthday = models.DateField(auto_now_add=False, auto_now=False, null=True)
 
     USERNAME_FIELD = 'email'
     objects = UserManager()
