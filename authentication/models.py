@@ -1,8 +1,12 @@
+from uuid import uuid4
+
 from django.contrib.auth.models import BaseUserManager
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 
 # Create your models here.
+from django.utils.text import slugify
+
 from portal.models import Branch
 from datetime import datetime
 
@@ -39,12 +43,14 @@ class User(AbstractBaseUser):
     contact = models.PositiveBigIntegerField(default=0)
     last_login = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     otp_verified = models.BooleanField(default=False)
     profile_pic = models.OneToOneField('portal.Updates', on_delete=models.SET_NULL, null=True, related_name='DP')
     cover_pic = models.OneToOneField('portal.Updates', on_delete=models.SET_NULL, null=True,
                                      related_name='CoverPicture')
     birthday = models.DateField(auto_now_add=False, auto_now=False, null=True)
+    slug = models.SlugField(max_length=40, null=True)
 
     USERNAME_FIELD = 'email'
     objects = UserManager()
@@ -63,6 +69,10 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.first_name + self.last_name + uuid4().hex)
+        super(User, self).save(*args, **kwargs)
 
 
 class OTP(models.Model):

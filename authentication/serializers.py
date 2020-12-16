@@ -4,6 +4,7 @@ from .models import *
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 from django.contrib.auth.models import update_last_login
+from django.utils.text import slugify
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -20,6 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.first_name = validated_data['first_name']
         user.last_name = validated_data['last_name']
         user.contact = validated_data['contact']
+        user.slug = slugify(user.first_name + user.last_name)
 
         user.save()
 

@@ -2,6 +2,8 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from authentication.models import User
 from .serializers import *
 from .models import *
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
@@ -138,12 +140,65 @@ class PendingView(APIView):
         connection = Connection.objects.get(sender=sender, receiver=profile.email)
         connection.approved = True
         connection.save()
+        try:
+            connection = Connection.objects.get(sender=profile, receiver=sender.email)
+            connection.approved = True
+            connection.save()
+        except Connection.DoesNotExist:
+            pass
         profile.connections.add(sender)
         sender.connections.add(profile)
         sender.save()
         profile.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SearchView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication, ]
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request):
+        people = getPeople(request.data['search'], request.user)
+
+        context = {
+            'people': people,
+            'success': True
+        }
+
+        return Response(context, status=status.HTTP_200_OK)
+
+
+class RequestView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication, ]
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request):
+        email = request.data['email']
+        try:
+            Connection.objects.get(sender=Profile.objects.get(email=email), receiver=request.user.email)
+        except Connection.DoesNotExist:
+            Connection.objects.create(sender=Profile.objects.get(user=request.user), receiver=email).save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PersonProfileView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication, ]
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request):
+        user = User.objects.get(slug=request.data['slug'])
+        person = Profile.objects.get(user=user)
+        user_context = getUserProfile(person)
+
+        feed_context = getFeed(user)
+
+        context = {
+            'user_data': user_context,
+            'feed_data': feed_context,
+        }
+        return Response(context, status=status.HTTP_200_OK)
 
 
 def getFeed(user, all_feed=False):
@@ -209,7 +264,41 @@ def getConnectionList(profile):
         connection_list.append({
             'email': connection.email,
             'name': connection.user.first_name + ' ' + connection.user.last_name,
-            'profile_pic': connection.user.profile_pic.photo.url if connection.user.profile_pic else None
+            'profile_pic': connection.user.profile_pic.photo.url if connection.user.profile_pic else None,
+            'slug': connection.user.slug
         })
 
     return connection_list
+
+
+def getPeople(search, request_user):
+    people = []
+    if len(search.split(' ')) > 1:
+        user_list = User.objects.filter(first_name__contains=search.split(' ')[0], last_name__contains=search.split(' ')[1])
+    else:
+        user_list = set(list(User.objects.filter(first_name__contains=search)) +
+                        list(User.objects.filter(last_name__contains=search)))
+    for user in user_list:
+        if not user.is_superuser and not user == request_user:
+            try:
+                is_approved = Connection.objects.get(sender=Profile.objects.get(user=request_user),
+                                                     receiver=user.email).approved
+                is_sent = True
+            except Connection.DoesNotExist:
+                try:
+                    is_approved = Connection.objects.get(sender=Profile.objects.get(user=user),
+                                                         receiver=request_user.email).approved
+                    is_sent = True
+                except Connection.DoesNotExist:
+                    is_approved = False
+                    is_sent = False
+            people.append({
+                'email': user.email,
+                'name': user.first_name + ' ' + user.last_name,
+                'profile_pic': user.profile_pic.photo.url if user.profile_pic else None,
+                'is_approved': is_approved,
+                'is_sent': is_sent,
+                'slug': user.slug,
+            })
+
+    return people

@@ -83,7 +83,7 @@ export const PendingRequests = ({ open, setOpen }) => {
                     </DialogContentText>
                 </DialogContent>
                 <DialogContent>
-                    <List>
+                    <List style={{ overflow: 'auto'}}>
                         {pending_list.map((request, i) => {
                             return (
                                 <ListItem key={i}>

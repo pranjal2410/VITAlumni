@@ -31,11 +31,10 @@ import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import Checkbox from "@material-ui/core/Checkbox";
 import useTheme from "@material-ui/core/styles/useTheme";
 import Box from "@material-ui/core/Box";
-import TableBody from "@material-ui/core/TableBody";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import Table from "@material-ui/core/Table";
-import TableHead from "@material-ui/core/TableHead";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemText from "@material-ui/core/ListItemText";
+import List from "@material-ui/core/List";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -110,6 +109,7 @@ const Updates = () => {
     const classes = useStyles();
     const location = useLocation();
     const [feed, setFeed] = React.useState([]);
+    const [connection_list, setConnection_list] = React.useState([]);
     const [profile, setProfile] = React.useState({});
     const [submit, setSubmit] = React.useState(false);
     const [post, setPost] = React.useState({
@@ -134,6 +134,7 @@ const Updates = () => {
             setSubmit(false);
             setFeed(response.data.feed);
             setProfile(response.data.user_data);
+            setConnection_list(response.data.connection_list)
         }).catch(error => {
             console.log(error.response.data)
         })
@@ -271,12 +272,14 @@ const Updates = () => {
             <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto', overflowX: 'hidden', maxWidth: '33%'}}>
                 <Paper style={{ maxWidth: 350, margin: 'auto' }} elevation={10}>
                     <CardContent>
-                        <CardMedia
-                            className={classes.media}
-                            image={profile.profile_pic}
-                            component='img'
-                            title={profile.name}
-                        />
+                        {profile.profile_pic?(
+                            <CardMedia
+                                className={classes.media}
+                                image={profile.profile_pic}
+                                component='img'
+                                title={profile.name}
+                            />
+                        ):null}
                         <Typography gutterBottom variant="h5" component="h2">
                             {profile.name}
                         </Typography>
@@ -431,22 +434,21 @@ const Updates = () => {
             </Box>
             <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto', overflowX: 'hidden', maxWidth: '33%'}}>
                 <Paper style={{ maxWidth: 500, margin: 'auto', padding: '20px' }} elevation={10}>
-                    <Table stickyHeader>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>
-                                    <Typography variant="h4" component='h4' color="text.primary">
-                                        Your connection list:
-                                    </Typography>
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>Emai</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
+                    <Typography variant="h4" component='h4' color="text.primary">
+                        Your connection list:
+                    </Typography>
+                    <List style={{ overflow: 'auto'}}>
+                        {connection_list.map((connection, i) => {
+                            return (
+                                <ListItem key={i}>
+                                    <ListItemAvatar>
+                                        <Avatar aria-label={connection.name} className={classes.avatar} src={connection.profile_pic}/>
+                                    </ListItemAvatar>
+                                    <ListItemText primary={connection.name}/>
+                                </ListItem>
+                            )
+                        })}
+                    </List>
                 </Paper>
             </Box>
         </div>

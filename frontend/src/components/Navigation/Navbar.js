@@ -28,7 +28,7 @@ import {Backdrop} from "@material-ui/core";
 import {OTP} from "../authentication/OTP";
 import {PendingRequests} from "../profile/PendingRequests";
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -216,7 +216,7 @@ export default function Navbar() {
                             }}
                         >
                             <div className={classes.drawerHeader}>
-                                <Typography variant='h6' style={{ marginRight: theme.spacing(6), color: theme.palette.text.primary }}>Drawer</Typography>
+                                <Typography variant='h6' style={{ margin: 'auto', color: theme.palette.text.primary }}>Drawer</Typography>
                                 <IconButton onClick={handleDrawerClose}>
                                     {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                                 </IconButton>
