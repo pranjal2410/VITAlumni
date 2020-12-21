@@ -35,6 +35,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
 import List from "@material-ui/core/List";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -70,6 +71,13 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
+    },
+    spinner: {
+        display: 'flex',
+        '& > * + *': {
+            marginLeft: theme.spacing(2),
+        },
+        justifyContent: 'center',
     },
 }))
 
@@ -108,6 +116,7 @@ const Updates = () => {
         history.push('/sections');
     const classes = useStyles();
     const location = useLocation();
+    const [spinner, setSpinner] = React.useState(true);
     const [feed, setFeed] = React.useState([]);
     const [connection_list, setConnection_list] = React.useState([]);
     const [profile, setProfile] = React.useState({});
@@ -132,6 +141,7 @@ const Updates = () => {
             url: '/portal/updates/',
         }).then(response => {
             setSubmit(false);
+            setSpinner(false);
             setFeed(response.data.feed);
             setProfile(response.data.user_data);
             setConnection_list(response.data.connection_list)
@@ -267,7 +277,11 @@ const Updates = () => {
         })
     }
 
-    return (
+    return spinner?(
+        <div className={classes.spinner}>
+            <CircularProgress />
+        </div>
+    ):(
         <div className={classes.root}>
             <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto', overflowX: 'hidden', maxWidth: '33%'}}>
                 <Paper style={{ maxWidth: 350, margin: 'auto' }} elevation={10}>
@@ -280,7 +294,7 @@ const Updates = () => {
                                 title={profile.name}
                             />
                         ):null}
-                        <Typography gutterBottom variant="h5" component="h2">
+                        <Typography gutterBottom variant="h5" component="h2" style={{ marginTop: '5px'}}>
                             {profile.name}
                         </Typography>
                         <Typography variant="body2" color="textSecondary" component="p">
@@ -378,7 +392,7 @@ const Updates = () => {
                             <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={10} id={'paper'+i}>
                                 <CardHeader
                                     avatar={
-                                        <Avatar aria-label={update.user} className={classes.avatar} src={update.user_dp} />
+                                        <Avatar aria-label={update.user} className={classes.avatar} src={update.user_dp}>{update.user_dp}</Avatar>
                                     }
                                     action={update.by_self?(
                                         <>
@@ -434,7 +448,7 @@ const Updates = () => {
             </Box>
             <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto', overflowX: 'hidden', maxWidth: '33%'}}>
                 <Paper style={{ maxWidth: 500, margin: 'auto', padding: '20px' }} elevation={10}>
-                    <Typography variant="h4" component='h4' color="text.primary">
+                    <Typography variant="h4" component='h4' color="textPrimary">
                         Your connection list:
                     </Typography>
                     <List style={{ overflow: 'auto'}}>
@@ -444,7 +458,7 @@ const Updates = () => {
                                     <ListItemAvatar>
                                         <Avatar aria-label={connection.name} className={classes.avatar} src={connection.profile_pic}/>
                                     </ListItemAvatar>
-                                    <ListItemText primary={connection.name}/>
+                                    <ListItemText primary={<Link to={'/person/'+connection.slug} className={classes.link}>{connection.name}</Link>}/>
                                 </ListItem>
                             )
                         })}

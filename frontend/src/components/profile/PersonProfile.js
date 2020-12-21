@@ -15,7 +15,6 @@ import {Link} from "react-router-dom";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbUpOutlinedIcon from "@material-ui/icons/ThumbUpOutlined";
 import Fade from "@material-ui/core/Fade";
-import {useTransition, animated} from 'react-spring';
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import Table from "@material-ui/core/Table";
@@ -31,6 +30,7 @@ const useStyles = makeStyles(theme => ({
     },
     title: {
         color: theme.palette.text.primary,
+        marginTop: '10px'
     },
     spinner: {
         display: 'flex',
@@ -73,28 +73,12 @@ const useStyles = makeStyles(theme => ({
         borderRadius: '10px',
     },
     table: {
+        marginTop: '10px',
         maxWidth: '100%',
         backgroundColor: theme.palette.background.paper,
         color: theme.palette.text.primary
     },
 }));
-
-const Slide = (props) => {
-
-    const transition = useTransition(true, null, {
-        from: { transform: 'translate3d(0,-40px,0)' },
-        enter: { transform: 'translate3d(0,0px,0)' },
-        leave: { transform: 'translate3d(0,-40px,0)' },
-    })
-
-    return transition.map(transition => {
-        return (
-            <animated.div style={transition}>
-                {props.children}
-            </animated.div>
-        )
-    })
-}
 
 const PersonProfile = (props) => {
     const classes = useStyles();
@@ -115,7 +99,7 @@ const PersonProfile = (props) => {
             },
             url: '/portal/view-profile/',
         }).then(response => {
-            setProfile(response.data.user_data)
+            setProfile(response.data.person_data)
             setFeed(response.data.feed_data)
             setSpinner(false);
         }).catch(err => {
@@ -148,127 +132,160 @@ const PersonProfile = (props) => {
         })
     }
 
+    const handleRequest = (e) => {
+        let prof = profile;
+        prof.is_sent = true;
+        setProfile(prof);
+        axios({
+            method: 'POST',
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type" : "application/json",
+                "Authorization": `Token ${getToken()}`,
+            },
+            data: {
+                'email': profile.email
+            },
+            url: '/portal/request-connect/'
+        }).then(res => {
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
     return spinner?(
         <div className={classes.spinner}>
             <CircularProgress />
         </div>
     ):(
-        <Slide>
-            <div className={classes.root}>
-                <Fade in={true} timeout={1000}>
-                    <div style={{display: 'flex'}}>
-                        <Box style={{maxHeight: '100vh', margin: '20px', padding: '10px'}}>
-                            <Paper className={classes.bannerBackground} elevation={15} style={{ backgroundImage: profile.cover_pic?`url(${profile.cover_pic})`:`url(${img})`}}>
-                                {profile.profile_pic?(
-                                    <Avatar src={profile.profile_pic} alt={profile.name} className={classes.avatar}/>
-                                ):(
-                                    <Avatar className={classes.avatar}>{profile.name.slice(0,1)}</Avatar>
-                                )}
-                            </Paper>
-                        </Box>
-                        <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto'}}>
-                            <Typography className={classes.title} component='h4' variant='h2'>{profile.name}</Typography>
-                            <div className={classes.table}>
-                                <Table stickyHeader>
-                                    <TableBody>
-                                        <TableRow key={i++}>
-                                            <TableCell>Email:</TableCell>
-                                            <TableCell>
-                                                <a href={"mailto:"+profile.email} style={{ color: 'white' }}>{profile.email}</a>
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow key={i++}>
-                                            <TableCell>Home Team</TableCell>
-                                            <TableCell>
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow key={i++}>
-                                            <TableCell>Away Team</TableCell>
-                                            <TableCell>
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow key={i++}>
-                                            <TableCell>Winner</TableCell>
-                                            <TableCell>
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow key={i++}>
-                                            <TableCell>Winning criteria</TableCell>
-                                            <TableCell>
-                                                Jai Hind
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        </Box>
-                    </div>
-                </Fade>
-                <Fade in={true} timeout={3000}>
-                    <Typography className={classes.title} variant='h4' style={{textAlign: 'center', marginTop: '75px', overflow: 'visible'}}>
-                        Updates posted by {profile.name}:
-                    </Typography>
-                </Fade>
-                <Fade in={true} timeout={3000}>
-                    <Box style={{ maxHeight: '80vh', overflow: 'auto', marginTop: '20px', overflowX: 'hidden'}}>
-                        <Grid container spacing={3}>
-                            {feed.map((update, i) => {
-                                const date = new Date(update.created_on);
-                                return (
-                                    <Grid item xs={12} key={i}>
-                                        <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={10} id={'paper'+i}>
-                                            <CardHeader
-                                                avatar={
-                                                    <Avatar aria-label={update.user} className={classes.feedAvatar} src={update.user_dp} />
-                                                }
-                                                action={update.by_self?(
-                                                    <>
-                                                        <IconButton aria-label="settings">
-                                                            <MoreVertIcon />
-                                                        </IconButton>
-                                                    </>
-                                                ):null}
-                                                title={update.user}
-                                                subheader={months[date.getUTCMonth()] + ' ' + date.getUTCDate() + ', ' + date.getUTCFullYear()}
-                                            />
-                                            <CardContent>
-                                                {update.text!=='null'?(
-                                                    <Typography variant="body2" color="textSecondary" component="p">
-                                                        {update.text}
-                                                    </Typography>
-                                                ):null}
-                                                {update.photo?(
-                                                    <CardMedia
-                                                        className={classes.photo}
-                                                        component='img'
-                                                        image={update.photo}
-                                                    />
-                                                ):null}
-                                                {update.doc?(
-                                                    <>
-                                                        <br/>
-                                                        <Link to='#' className={classes.link} onClick={() => window.open('http://localhost:8000'+update.doc)}>Click here to download the document</Link>
-                                                    </>
-                                                ):null}
-                                            </CardContent>
-                                            <CardActions>
-                                                <Button size="medium" color="primary" startIcon={update.is_greeted?(<ThumbUpIcon/>):(<ThumbUpOutlinedIcon/>)} onClick={handleGreet(i)}>
-                                                    {update.is_greeted?('UnGreet'):('Greet')}
-                                                </Button>
-                                            </CardActions>
-                                            <CardContent>
-                                                <Typography variant="body2" color="textSecondary" component="p">
-                                                    {update.greets} people have greeted this.
-                                                </Typography>
-                                            </CardContent>
-                                        </Paper>
-                                    </Grid>)
-                            })}
-                        </Grid>
+        <div className={classes.root}>
+            <Fade in={true} timeout={1000}>
+                <div style={{display: 'flex'}}>
+                    <Box style={{maxHeight: '100vh', margin: '20px', padding: '10px'}}>
+                        <Paper className={classes.bannerBackground} elevation={15} style={{ backgroundImage: profile.cover_pic?`url(${profile.cover_pic})`:`url(${img})`}}>
+                            {profile.profile_pic?(
+                                <Avatar src={profile.profile_pic} alt={profile.name} className={classes.avatar}/>
+                            ):(
+                                <Avatar className={classes.avatar}>{profile.name.slice(0,1)}</Avatar>
+                            )}
+                        </Paper>
                     </Box>
-                </Fade>
-            </div>
-        </Slide>
+                    <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto'}}>
+                        <Typography className={classes.title} component='h4' variant='h2'>{profile.name}</Typography>
+                        {profile.is_approved?(
+                            <Typography className={classes.title} component='h4' variant='h4'>
+                                You guys are already connected!
+                            </Typography>
+                        ):profile.is_sent?(
+                            <Typography className={classes.title} component='h4' variant='h4'>
+                                Connection request already sent.
+                            </Typography>
+                        ):(
+                            <Button color='primary' variant='outlined' onClick={handleRequest}>
+                                Send Request
+                            </Button>
+                        )}
+
+                        <div className={classes.table}>
+                            <Table stickyHeader>
+                                <TableBody>
+                                    <TableRow key={i++}>
+                                        <TableCell>Email:</TableCell>
+                                        <TableCell>
+                                            <a href={"mailto:"+profile.email} style={{ color: 'white' }}>{profile.email}</a>
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow key={i++}>
+                                        <TableCell>Home Team</TableCell>
+                                        <TableCell>
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow key={i++}>
+                                        <TableCell>Away Team</TableCell>
+                                        <TableCell>
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow key={i++}>
+                                        <TableCell>Winner</TableCell>
+                                        <TableCell>
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow key={i++}>
+                                        <TableCell>Winning criteria</TableCell>
+                                        <TableCell>
+                                            Jai Hind
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </Box>
+                </div>
+            </Fade>
+            <Fade in={true} timeout={3000}>
+                <Typography className={classes.title} variant='h4' style={{textAlign: 'center', marginTop: '75px', overflow: 'visible'}}>
+                    Updates posted by {profile.name}:
+                </Typography>
+            </Fade>
+            <Fade in={true} timeout={3000}>
+                <Box style={{ maxHeight: '80vh', overflow: 'auto', marginTop: '20px', overflowX: 'hidden'}}>
+                    <Grid container spacing={3}>
+                        {feed.map((update, i) => {
+                            const date = new Date(update.created_on);
+                            return (
+                                <Grid item xs={12} key={i}>
+                                    <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={10} id={'paper'+i}>
+                                        <CardHeader
+                                            avatar={
+                                                <Avatar aria-label={update.user} className={classes.feedAvatar} src={update.user_dp} />
+                                            }
+                                            action={update.by_self?(
+                                                <>
+                                                    <IconButton aria-label="settings">
+                                                        <MoreVertIcon />
+                                                    </IconButton>
+                                                </>
+                                            ):null}
+                                            title={update.user}
+                                            subheader={months[date.getUTCMonth()] + ' ' + date.getUTCDate() + ', ' + date.getUTCFullYear()}
+                                        />
+                                        <CardContent>
+                                            {update.text!=='null'?(
+                                                <Typography variant="body2" color="textSecondary" component="p">
+                                                    {update.text}
+                                                </Typography>
+                                            ):null}
+                                            {update.photo?(
+                                                <CardMedia
+                                                    className={classes.photo}
+                                                    component='img'
+                                                    image={update.photo}
+                                                />
+                                            ):null}
+                                            {update.doc?(
+                                                <>
+                                                    <br/>
+                                                    <Link to='#' className={classes.link} onClick={() => window.open('http://localhost:8000'+update.doc)}>Click here to download the document</Link>
+                                                </>
+                                            ):null}
+                                        </CardContent>
+                                        <CardActions>
+                                            <Button size="medium" color="primary" startIcon={update.is_greeted?(<ThumbUpIcon/>):(<ThumbUpOutlinedIcon/>)} onClick={handleGreet(i)}>
+                                                {update.is_greeted?('UnGreet'):('Greet')}
+                                            </Button>
+                                        </CardActions>
+                                        <CardContent>
+                                            <Typography variant="body2" color="textSecondary" component="p">
+                                                {update.greets} people have greeted this.
+                                            </Typography>
+                                        </CardContent>
+                                    </Paper>
+                                </Grid>)
+                        })}
+                    </Grid>
+                </Box>
+            </Fade>
+        </div>
     )
 }
 

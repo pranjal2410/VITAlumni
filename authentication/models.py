@@ -46,6 +46,7 @@ class User(AbstractBaseUser):
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     otp_verified = models.BooleanField(default=False)
+    last_edited = models.DateField(auto_now=False, auto_now_add=False, null=True)
     profile_pic = models.OneToOneField('portal.Updates', on_delete=models.SET_NULL, null=True, related_name='DP')
     cover_pic = models.OneToOneField('portal.Updates', on_delete=models.SET_NULL, null=True,
                                      related_name='CoverPicture')

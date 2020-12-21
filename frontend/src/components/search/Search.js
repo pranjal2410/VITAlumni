@@ -21,6 +21,9 @@ import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 import {green, orange} from "@material-ui/core/colors";
 import Button from "@material-ui/core/Button";
 import {useHistory} from "react-router";
+import Collapse from '@material-ui/core/Collapse';
+import CardContent from "@material-ui/core/CardContent";
+import {CardActions, CardMedia, Typography} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -52,6 +55,12 @@ const useStyles = makeStyles((theme) => ({
         },
         height: '40vh',
     },
+    media: {
+        height: 350,
+        display: 'flex',
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
+    },
 }));
 
 const Search = () => {
@@ -59,6 +68,7 @@ const Search = () => {
     let history = useHistory();
     const [search, setSearch] = React.useState('');
     const [people, setPeople] = React.useState([]);
+    const [submitted, setSubmitted] = React.useState(false);
 
     const handleChange = (e) => {
         setSearch(e.target.value);
@@ -105,47 +115,113 @@ const Search = () => {
         history.push('/person/'+people[i].slug);
     }
 
+    const handleSubmit = (e) => {
+        axios({
+            method: 'POST',
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type" : "application/json",
+                "Authorization": `Token ${getToken()}`,
+            },
+            data: {
+                'search': search,
+            },
+            url: '/portal/get-people/',
+        }).then(response => {
+            setPeople(response.data.people);
+            return true;
+        }).then(res => {
+            setSubmitted(true);
+        }).catch(err => {
+            console.log(err);
+        })
+    }
+
     return (
-            <Grid
-                container
-                direction = "column"
-                justify = "flex-start"
-                alignItems = "center"
-            >
-                <img src={logo} alt="BG" className={classes.img} />
-                <Paper className={classes.root} elevation={10}>
-                    <IconButton className={classes.iconButton} aria-label="menu">
-                        <MenuIcon />
-                    </IconButton>
-                    <InputBase
-                        fullWidth
-                        id={'search'}
-                        name={'search'}
-                        value={search}
-                        className={classes.input}
-                        onChange={handleChange}
-                        placeholder="Enter name of Alumni"
-                        inputProps={{ 'aria-label': 'name of alumni' }}
-                    />
-                    <IconButton type="submit" className={classes.iconButton} aria-label="search">
-                        <SearchIcon />
-                    </IconButton>
-                    <Divider className={classes.divider} orientation="vertical" />
-                    <IconButton color="primary" className={classes.iconButton} aria-label="directions">
-                        <DirectionsIcon />
-                    </IconButton>
-                </Paper>
+        <>
+            <Collapse in={!submitted}>
+                <Grid
+                    container
+                    direction = "column"
+                    justify = "flex-start"
+                    alignItems = "center"
+                >
+                    <img src={logo} alt="BG" className={classes.img} />
+                    <Paper className={classes.root} elevation={10}>
+                        <IconButton className={classes.iconButton} aria-label="menu">
+                            <MenuIcon />
+                        </IconButton>
+                        <InputBase
+                            fullWidth
+                            id={'search'}
+                            name={'search'}
+                            value={search}
+                            className={classes.input}
+                            onChange={handleChange}
+                            placeholder="Enter name of Alumni"
+                            inputProps={{ 'aria-label': 'name of alumni' }}
+                        />
+                        <IconButton onClick={handleSubmit} className={classes.iconButton} aria-label="search">
+                            <SearchIcon />
+                        </IconButton>
+                        <Divider className={classes.divider} orientation="vertical" />
+                        <IconButton color="primary" className={classes.iconButton} aria-label="directions">
+                            <DirectionsIcon />
+                        </IconButton>
+                    </Paper>
+                    {people.length > 0?(
+                        <Paper elevation={10} style={{ width: '50%', margin: '20px', overflow: 'auto' }}>
+                            <List>
+                                {people.map((person, i) => {
+                                    return (
+                                        <ListItem key={i}>
+                                            <ListItemAvatar>
+                                                <Avatar aria-label={person.name} className={classes.avatar} src={person.profile_pic}>{person.name.slice(0,1)}</Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText primary={person.name}/>
+                                            <ListItemSecondaryAction>
+                                                {person.is_approved?null:(person.is_sent?(
+                                                    <IconButton edge='end' aria-label='approve' style={{ margin: '10px'}}>
+                                                        <CheckCircleRoundedIcon style={{ color: green[500]}}/>
+                                                    </IconButton>
+                                                ):(
+                                                    <Button edge='end' aria-label='send' onClick={handleRequest(i)} color='primary' style={{ margin: '10px'}}>
+                                                        Send Request
+                                                    </Button>
+                                                ))}
+                                                <Button edge='end' aria-label='send' color='primary' onClick={handleView(i)}>
+                                                    View Profile
+                                                </Button>
+                                            </ListItemSecondaryAction>
+                                        </ListItem>
+                                    )
+                                })}
+                            </List>
+                        </Paper>
+                    ):null}
+                </Grid>
+            </Collapse>
+            <Collapse in={submitted}>
                 {people.length > 0?(
-                    <Paper elevation={10} style={{ width: '50%', margin: '20px', overflow: 'auto' }}>
-                        <List>
-                            {people.map((person, i) => {
-                                return (
-                                    <ListItem key={i}>
-                                        <ListItemAvatar>
-                                            <Avatar aria-label={person.name} className={classes.avatar} src={person.profile_pic}>{person.name.slice(0,1)}</Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText primary={person.name}/>
-                                        <ListItemSecondaryAction>
+                    <Grid container spacing={3} style={{ margin: 'auto', padding: '20px', width: '75vw'}}>
+                        {people.map((person, i) => {
+                            return (
+                                <Grid item key={i} xs={12} md={4} lg={4}>
+                                    <Paper elevation={10} style={{ maxWidth: 350}}>
+                                        <CardContent>
+                                            {person.profile_pic?(
+                                                <CardMedia
+                                                    className={classes.media}
+                                                    image={person.profile_pic}
+                                                    component='img'
+                                                    title={person.name}
+                                                />
+                                            ):null}
+                                            <Typography gutterBottom variant="h5" component="h2" style={{ marginTop: '5px'}}>
+                                                {person.name}
+                                            </Typography>
+                                        </CardContent>
+                                        <CardActions>
                                             {person.is_approved?null:(person.is_sent?(
                                                 <IconButton edge='end' aria-label='approve' style={{ margin: '10px'}}>
                                                     <CheckCircleRoundedIcon style={{ color: green[500]}}/>
@@ -158,14 +234,19 @@ const Search = () => {
                                             <Button edge='end' aria-label='send' color='primary' onClick={handleView(i)}>
                                                 View Profile
                                             </Button>
-                                        </ListItemSecondaryAction>
-                                    </ListItem>
-                                )
-                            })}
-                        </List>
-                    </Paper>
-                ):null}
-            </Grid>
+                                        </CardActions>
+                                    </Paper>
+                                </Grid>
+                            )
+                        })}
+                    </Grid>
+                ):(
+                    <Typography variant="h2" component="h2">
+                        No results found for the name you entered.
+                    </Typography>
+                )}
+            </Collapse>
+        </>
     );
 }
 

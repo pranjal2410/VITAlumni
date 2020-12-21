@@ -190,23 +190,56 @@ class PersonProfileView(APIView):
     def post(self, request):
         user = User.objects.get(slug=request.data['slug'])
         person = Profile.objects.get(user=user)
-        user_context = getUserProfile(person)
+        user_context = getUserProfile(Profile.objects.get(user=request.user))
+        person_context = getUserProfile(person, Profile.objects.get(user=request.user))
 
-        feed_context = getFeed(user)
+        feed_context = getFeed(user=user, request_user=request.user)
 
         context = {
             'user_data': user_context,
+            'person_data': person_context,
             'feed_data': feed_context,
         }
         return Response(context, status=status.HTTP_200_OK)
 
 
-def getFeed(user, all_feed=False):
+class EditProfileView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication, ]
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request):
+        user_context = getUserProfile(Profile.objects.get(user=request.user))
+        user_context['first_name'] = request.user.first_name
+        user_context['last_name'] = request.user.last_name
+
+        context = {
+            'user_data': user_context,
+            'success': True,
+        }
+
+        return Response(context, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = EditSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            context = {
+                'success': True,
+            }
+
+            return Response(context, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+def getFeed(user, all_feed=False, request_user=None):
     if all_feed:
         updates = Updates.objects.all().order_by('-created_on')
     else:
         updates = Updates.objects.filter(user=user).order_by('-created_on')
-    person = Profile.objects.get(user=user)
+    if request_user is not None:
+        person = Profile.objects.get(user=request_user)
+    else:
+        person = Profile.objects.get(user=user)
     greeted_list = person.greeted
     feed = []
     for update in updates:
@@ -236,7 +269,7 @@ def getFeed(user, all_feed=False):
     return feed
 
 
-def getUserProfile(profile):
+def getUserProfile(profile, user_profile=None):
     updates = Updates.objects.filter(user=profile.user).order_by('-created_on')
     user_context = {'name': profile.user.first_name + ' ' + profile.user.last_name, 'email': profile.user.email}
     for update in updates:
@@ -252,8 +285,25 @@ def getUserProfile(profile):
     user_context['connections'] = len(profile.connections.all())
     user_context['date_joined'] = profile.user.date_registered
     user_context['birthday'] = profile.user.birthday
-    user_context['branch'] = profile.branch
+    user_context['branch'] = profile.branch.name if profile.branch is not None else ''
     user_context['contact'] = profile.user.contact
+    user_context['graduation'] = profile.graduation
+
+    if user_profile is not None:
+        try:
+            is_approved = Connection.objects.get(sender=profile,
+                                                 receiver=user_profile.user.email).approved
+            is_sent = True
+        except Connection.DoesNotExist:
+            try:
+                is_approved = Connection.objects.get(sender=user_profile,
+                                                     receiver=profile.user.email).approved
+                is_sent = True
+            except Connection.DoesNotExist:
+                is_approved = False
+                is_sent = False
+        user_context['is_approved'] = is_approved
+        user_context['is_sent'] = is_sent
 
     return user_context
 

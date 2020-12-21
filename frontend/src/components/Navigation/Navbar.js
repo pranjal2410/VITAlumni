@@ -27,6 +27,8 @@ import {Logout} from "../authentication/Logout";
 import {Backdrop} from "@material-ui/core";
 import {OTP} from "../authentication/OTP";
 import {PendingRequests} from "../profile/PendingRequests";
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import {EditProfile} from "../profile/EditProfile";
 
 const drawerWidth = 300;
 
@@ -93,6 +95,7 @@ export default function Navbar() {
     const [signUp, setSignUp] = React.useState(false);
     const [loggedIn, setLoggedIn] = React.useState(false);
     const [pending, setPending] = React.useState(false);
+    const [edit, setEdit] = React.useState(false);
     const [logout, setLogout] = React.useState(false);
     const [otp, setOTP] = React.useState(false);
     const location = useLocation();
@@ -144,7 +147,7 @@ export default function Navbar() {
                     setTab(5);
                 break;
             default:
-                setTab(-1);
+                setTab(null);
         }
     }, [location, login, signUp, logout])
 
@@ -240,6 +243,10 @@ export default function Navbar() {
                                             <ListItemIcon><People/></ListItemIcon>
                                             <ListItemText primary={'Pending Requests'} />
                                         </ListItem>
+                                        <ListItem button key={'Edit Profile'} onClick={() => setEdit(true)}>
+                                            <ListItemIcon><EditOutlinedIcon/></ListItemIcon>
+                                            <ListItemText primary={'Edit Profile'} />
+                                        </ListItem>
                                         <ListItem button key={'Logout'} onClick={() => setLogout(true)}>
                                             <ListItemIcon><ExitToApp/></ListItemIcon>
                                             <ListItemText primary={'Logout'} />
@@ -256,6 +263,7 @@ export default function Navbar() {
             <SignUp open={signUp} setOpen={setSignUp} otp={otp} setOTP={setOTP}/>
             <OTP open={otp} setOpen={setOTP} setLoggedIn={setLoggedIn}/>
             <PendingRequests open={pending} setOpen={setPending}/>
+            <EditProfile open={edit} setOpen={setEdit}/>
             <Logout open={logout} setOpen={setLogout} setLoggedIn={setLoggedIn}/>
         </>
     );

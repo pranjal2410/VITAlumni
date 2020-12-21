@@ -11,4 +11,5 @@ urlpatterns = [
     path('get-people/', SearchView.as_view(), name='get-people'),
     path('request-connect/', RequestView.as_view(), name='request-connect'),
     path('view-profile/', PersonProfileView.as_view(), name='person-profile'),
+    path('edit-profile/', EditProfileView.as_view(), name='edit-profile'),
 ]
