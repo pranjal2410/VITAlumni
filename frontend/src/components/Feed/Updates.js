@@ -401,7 +401,9 @@ const Updates = () => {
                                             </IconButton>
                                         </>
                                     ):null}
-                                    title={update.user}
+                                    title={update.is_profile_pic?update.user + ' updated their profile picture':
+                                    update.is_cover_pic?update.user + ' updated their cover picture':
+                                    update.is_job_update?update.user + ' added a job update':update.user}
                                     subheader={months[date.getUTCMonth()] + ' ' + date.getUTCDate() + ', ' + date.getUTCFullYear()}
                                 />
                                 <CardContent>

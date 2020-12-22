@@ -6,7 +6,6 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import DirectionsIcon from '@material-ui/icons/Directions';
 import logo from './main-logo.png';
 import Grid from "@material-ui/core/Grid";
 import axios from 'axios';
@@ -24,6 +23,7 @@ import {useHistory} from "react-router";
 import Collapse from '@material-ui/core/Collapse';
 import CardContent from "@material-ui/core/CardContent";
 import {CardActions, CardMedia, Typography} from "@material-ui/core";
+import ClearIcon from '@material-ui/icons/Clear';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -161,12 +161,12 @@ const Search = () => {
                             placeholder="Enter name of Alumni"
                             inputProps={{ 'aria-label': 'name of alumni' }}
                         />
-                        <IconButton onClick={handleSubmit} className={classes.iconButton} aria-label="search">
-                            <SearchIcon />
+                        <IconButton className={classes.iconButton} onClick={() => setSearch('')} aria-label="clear">
+                            <ClearIcon/>
                         </IconButton>
                         <Divider className={classes.divider} orientation="vertical" />
-                        <IconButton color="primary" className={classes.iconButton} aria-label="directions">
-                            <DirectionsIcon />
+                        <IconButton onClick={handleSubmit} className={classes.iconButton} aria-label="search">
+                            <SearchIcon />
                         </IconButton>
                     </Paper>
                     {people.length > 0?(
