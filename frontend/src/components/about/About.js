@@ -6,6 +6,10 @@ import pranjal from './pranjal2410-2.jpg';
 import thite from './thite1811-2.jpeg';
 import {CardContent, CardMedia, Typography} from "@material-ui/core";
 import Grow from "@material-ui/core/Grow";
+import CardActions from "@material-ui/core/CardActions";
+import LinkedInIcon from '@material-ui/icons/LinkedIn';
+import MailIcon from '@material-ui/icons/Mail';
+import IconButton from "@material-ui/core/IconButton";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -16,6 +20,12 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         display: 'flex',
         color: theme.palette.text.secondary,
+    },
+    linkedIn: {
+        color: '#0E76A8',
+    },
+    gmail: {
+        color: '#EA4335',
     },
     media: {
         height: 350,
@@ -49,6 +59,14 @@ const About = () => {
                                 component='img'
                                 title='Pranjal Newalkar'
                             />
+                            <CardActions style={{ justifyContent: 'center'}}>
+                                <IconButton size="medium" className={classes.linkedIn} onClick={() => window.open('https://www.linkedin.com/in/pranjal-newalkar/')}>
+                                    <LinkedInIcon fontSize='large'/>
+                                </IconButton>
+                                <IconButton size="medium" className={classes.gmail} onClick={() => window.open('mailto:newalkarpranjal2410.pn@gmail.com')}>
+                                    <MailIcon fontSize='large'/>
+                                </IconButton>
+                            </CardActions>
                             <Typography gutterBottom color='textPrimary' variant="h5" component="h2" style={{ marginTop: '5px'}}>
                                 Pranjal Newalkar
                             </Typography>
@@ -71,6 +89,14 @@ const About = () => {
                                 component='img'
                                 title='Piyush Thite'
                             />
+                            <CardActions style={{ justifyContent: 'center'}}>
+                                <IconButton size="medium" className={classes.linkedIn} onClick={() => window.open('https://www.linkedin.com/in/piyush-thite-207a921b4/')}>
+                                    <LinkedInIcon fontSize='large'/>
+                                </IconButton>
+                                <IconButton size="medium" className={classes.gmail} onClick={() => window.open('mailto:piyush.thite@gmail.com')}>
+                                    <MailIcon fontSize='large'/>
+                                </IconButton>
+                            </CardActions>
                             <Typography gutterBottom color='textPrimary' variant="h5" component="h2" style={{ marginTop: '5px'}}>
                                 Piyush Thite
                             </Typography>

@@ -7,6 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import logo from './main-logo.png';
+import darkLogo from './main-logo-dark.png';
 import Grid from "@material-ui/core/Grid";
 import axios from 'axios';
 import {getToken} from "../authentication/cookies";
@@ -24,6 +25,7 @@ import Collapse from '@material-ui/core/Collapse';
 import CardContent from "@material-ui/core/CardContent";
 import {CardActions, CardMedia, Typography} from "@material-ui/core";
 import ClearIcon from '@material-ui/icons/Clear';
+import {ThemeContext} from "../../context/ThemeContext";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -66,6 +68,7 @@ const useStyles = makeStyles((theme) => ({
 const Search = () => {
     const classes = useStyles();
     let history = useHistory();
+    const {dark} = React.useContext(ThemeContext);
     const [search, setSearch] = React.useState('');
     const [people, setPeople] = React.useState([]);
     const [submitted, setSubmitted] = React.useState(false);
@@ -146,7 +149,7 @@ const Search = () => {
                     justify = "flex-start"
                     alignItems = "center"
                 >
-                    <img src={logo} alt="BG" className={classes.img} />
+                    <img src={dark?logo:darkLogo} alt="BG" className={classes.img} />
                     <Paper className={classes.root} elevation={10}>
                         <IconButton className={classes.iconButton} aria-label="menu">
                             <MenuIcon />

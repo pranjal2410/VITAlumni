@@ -19,7 +19,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import {useTheme} from "@material-ui/core";
 import Hidden from "@material-ui/core/Hidden";
 import {useHistory, useLocation} from "react-router";
-import {AccountCircle, ExitToApp, LockOpen, People} from "@material-ui/icons";
+import {AccountCircle, Brightness4, Brightness7, ExitToApp, LockOpen, People} from "@material-ui/icons";
 import {Login} from "../authentication/Login";
 import {SignUp} from "../authentication/SignUp";
 import {getCookie, getToken} from "../authentication/cookies";
@@ -29,6 +29,7 @@ import {OTP} from "../authentication/OTP";
 import {PendingRequests} from "../profile/PendingRequests";
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import {EditProfile} from "../profile/EditProfile";
+import {ThemeContext} from "../../context/ThemeContext";
 
 const drawerWidth = 300;
 
@@ -87,6 +88,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Navbar() {
     const classes = useStyles();
+    const {dark, toggleTheme} = React.useContext(ThemeContext);
     const [tab, setTab] = React.useState(0);
     const theme = useTheme();
     const history = useHistory();
@@ -180,7 +182,7 @@ export default function Navbar() {
     return (
         <>
             <AppBar position="sticky" className={clsx(classes.appBar, {[classes.appBarShift]: open})}>
-                <Toolbar>
+                <Toolbar style={{ width: '100%'}}>
                     <IconButton
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
@@ -257,6 +259,9 @@ export default function Navbar() {
                             <Divider />
                         </Drawer>
                     </Backdrop>
+                    <IconButton edge='end' color='textPrimary' onClick={toggleTheme}>
+                        {dark ? <Brightness7/>: <Brightness4/>}
+                    </IconButton>
                 </Toolbar>
             </AppBar>
             <Login open={login} setOpen={setLogin} setOTP={setOTP}/>

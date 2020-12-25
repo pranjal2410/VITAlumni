@@ -36,6 +36,7 @@ class Updates(models.Model):
     is_profile_pic = models.BooleanField(default=False)
     is_cover_pic = models.BooleanField(default=False)
     is_job_update = models.BooleanField(default=False)
+    is_notice = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.email + ' ' + self.created_on.__str__()

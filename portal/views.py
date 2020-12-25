@@ -10,6 +10,20 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 
 # Create your views here.
+class HomeView(APIView):
+    permission_classes = [AllowAny, ]
+
+    def get(self, request):
+        notices = getNotices(Updates.objects.filter(is_notice=True).order_by('-created_on')[:5])
+
+        context = {
+            'success': True,
+            'notices': notices,
+        }
+
+        return Response(context, status=status.HTTP_200_OK)
+
+
 class BranchListView(APIView):
     permission_classes = [AllowAny, ]
 
@@ -253,7 +267,8 @@ def getFeed(user, all_feed=False, request_user=None):
         update_dict['is_job_update'] = update.is_job_update
         update_dict['created_on'] = update.created_on
         update_dict['user'] = update.user.first_name + ' ' + update.user.last_name
-        update_dict['user_dp'] = update.user.profile_pic.photo.url if update.user.profile_pic else update.user.first_name[
+        update_dict['user_dp'] = update.user.profile_pic.photo.url if update.user.profile_pic else \
+        update.user.first_name[
             0].upper()
         update_dict['id'] = update.id
         update_dict['greets'] = len(update.profile_set.all())
@@ -324,7 +339,8 @@ def getConnectionList(profile):
 def getPeople(search, request_user):
     people = []
     if len(search.split(' ')) > 1:
-        user_list = User.objects.filter(first_name__contains=search.split(' ')[0], last_name__contains=search.split(' ')[1])
+        user_list = User.objects.filter(first_name__contains=search.split(' ')[0],
+                                        last_name__contains=search.split(' ')[1])
     else:
         user_list = set(list(User.objects.filter(first_name__contains=search)) +
                         list(User.objects.filter(last_name__contains=search)))
@@ -352,3 +368,17 @@ def getPeople(search, request_user):
             })
 
     return people
+
+
+def getNotices(updates):
+    notices = []
+    for update in updates:
+        notices.append({
+            'created_on': update.created_on,
+            'text': update.text,
+            'photo': update.photo.url if update.photo else None,
+            'doc': update.doc.url if update.doc else None,
+            'posted_by': update.user.first_name + ' ' + update.user.last_name,
+            'email': update.user.email
+        })
+    return notices

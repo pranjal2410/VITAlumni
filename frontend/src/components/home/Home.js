@@ -7,27 +7,65 @@ import college2 from './college2.jpg';
 import college3 from './college3.png';
 import college4 from './college4.jpg';
 import Grid from "@material-ui/core/Grid";
-import About from "../about/About";
+import Paper from "@material-ui/core/Paper";
+import axios from 'axios';
+import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import TableBody from "@material-ui/core/TableBody";
 
 const slides = [
-    { id: 0, url: logo },
-    { id: 1, url: college },
-    { id: 2, url: college2 },
-    { id: 3, url: college3 },
-    { id: 4, url: college4 },
+    { id: 0, url: logo, color: 'white' },
+    { id: 1, url: college, color: 'black' },
+    { id: 2, url: college2, color: 'black' },
+    { id: 3, url: college3, color: 'black' },
+    { id: 4, url: college4, color: 'black' },
 ]
+
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        width: '100%',
-        height: 350,
-        top: 0,
-        left: 0,
+        width: '50%',
+        display: 'flex',
+        height: 500,
         position: 'absolute',
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
+        borderRadius: '5px',
         willChange: 'opacity',
+    },
+    banner: {
+        margin: 'auto',
+        width: '75vw',
+        justifyContent: 'center',
+        backgroundColor: theme.palette.background.paper,
+        height: '30vh',
+        textAlign: 'center',
+        borderRadius: '5px',
+        display: 'flex',
+    },
+    paper: {
+        margin: '20px',
+        justifyContent: 'center',
+        height: 500,
+        textAlign: 'center',
+        borderRadius: '10px',
+        display: 'flex',
+    },
+    title: {
+        fontSize: 54,
+        fontFamily: 'Arial Black',
+        marginLeft: '50px',
+    },
+    newsTable: {
+        height: 500,
+        backgroundColor: theme.palette.background.paper,
+        margin: 'auto',
+        width: 500,
+        cursor: 'pointer',
     }
 }))
 
@@ -46,7 +84,7 @@ const Carousel = (prop) => {
                 <animated.div
                     key={key}
                     className={classes.root}
-                    style={{ ...props, backgroundImage: `url(${item.url})` }}
+                    style={{ ...props, backgroundImage: `url(${item.url})`, color: item.color }}
                 >
                     {prop.children}
                 </animated.div>
@@ -54,36 +92,115 @@ const Carousel = (prop) => {
 }
 
 const GrowOnScroll = (props) => {
+    const {children, threshold} = props;
     const trigger = useScrollTrigger({
-        threshold: 50,
+        threshold: threshold,
         disableHysteresis: true
     })
 
     return (
         <Grow in={trigger} timeout={2000}>
-            {props.children}
+            {children}
         </Grow>
     )
 }
 
 const Home = () => {
+    const classes = useStyles();
+    const [news, setNews] = useState([]);
+    useEffect(() => {
+        axios({
+            method: "GET",
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type" : "application/json",
+            },
+            url: '/portal/home/'
+        }).then(response => {
+            setNews(response.data.notices)
+        }).catch(error => {
+            console.log(error)
+        })
+    }, [])
+
+    const handleNews = i => (e) => {
+        console.log(news[i]);
+    }
+
     return (
-        <Grid container style={{
-            padding: '10px',
-        }}>
-            <Grid item xs={12} style={{ height: 350 }}>
-                <Carousel />
-            </Grid>
-            <GrowOnScroll>
-                <Grid item xs={12}>
-                    <Typography component='h1' variant='h2'>
-                        Welcome to the VIT Alumni Portal!
+        <Grid
+            container
+            style={{
+                padding: '10px',
+                maxWidth: '100%',
+            }}
+            alignContent='center'
+        >
+            <Grow in={true} timeout={1500}>
+                <Grid item xs={12} style={{ marginTop: '20px'}}>
+                    <Paper elevation={10} className={classes.banner}>
+                        <Typography variant='h2' style={{ margin: 'auto', fontFamily: 'Impact'}}>
+                            Welcome to the VIT Alumni Portal!
+                        </Typography>
+                    </Paper>
+                </Grid>
+            </Grow>
+            <Grow in={true} timeout={2500}>
+                <Grid item xs={12} sm={6} style={{ margin: 'auto'}}>
+                    <Typography className={classes.title}>
+                        This Portal
+                    </Typography>
+                    <Typography component='p' variant='h5' color='textPrimary' style={{ marginLeft: '50px'}}>
+                        In this portal, we provide only the alumni and staff of this
+                        college to register themselves with a valid email address which they
+                        have provided for the college's record. The alumni and staff can
+                        connect to each other and post updates regarding their current
+                        status and job. Our goal is to make it easier for the staff and alumni
+                        to find each other and thus be updated.
                     </Typography>
                 </Grid>
+            </Grow>
+            <Grow in={true} timeout={3500}>
+                <Grid item xs={12} sm={6}>
+                    <div className={classes.paper}>
+                        <Carousel/>
+                    </div>
+                </Grid>
+            </Grow>
+            <GrowOnScroll threshold={200}>
+                <Grid item xs={12} sm={6}>
+                    <Paper className={classes.newsTable} elevation={10}>
+                        <Table className={classes.newsTable} aria-label="news table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>NEWS</TableCell>
+                                    <TableCell align="right">DATE POSTED</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {news.map((notice, i) => {
+                                    let date = new Date(notice.created_on);
+                                    return (
+                                        <TableRow key={i} onClick={handleNews(i)}>
+                                            <TableCell component="th" scope="row">
+                                                {notice.text}
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                {months[date.getUTCMonth()] + ' ' + date.getUTCDate() + ', ' + date.getUTCFullYear()}
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
+                            </TableBody>
+                        </Table>
+                    </Paper>
+                </Grid>
             </GrowOnScroll>
-            <GrowOnScroll>
-                <Grid item xs={12}>
-                    <About />
+            <GrowOnScroll threshold={200}>
+                <Grid item xs={12} sm={6}>
+                    <Typography className={classes.title}>
+                        News & Notices
+                    </Typography>
                 </Grid>
             </GrowOnScroll>
         </Grid>

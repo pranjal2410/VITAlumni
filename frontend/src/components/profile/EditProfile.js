@@ -57,7 +57,6 @@ export const EditProfile = ({ open, setOpen }) => {
             url: '/portal/edit-profile/'
         }).then(res => {
             setValues({
-                ...values,
                 first_name: res.data.user_data.first_name,
                 last_name: res.data.user_data.last_name,
                 contact: res.data.user_data.contact,
@@ -70,7 +69,7 @@ export const EditProfile = ({ open, setOpen }) => {
                 setBranch(res.data.user_data.branch);
             if(res.data.user_data.graduation !== null)
                 setGrad(new Date(res.data.user_data.graduation));
-            return values;
+            return true;
         }).then(val => {
             setSpinner(false);
         }).catch(error => {
