@@ -375,9 +375,10 @@ def getNotices(updates):
     for update in updates:
         notices.append({
             'created_on': update.created_on,
+            'title': update.title,
             'text': update.text,
-            'photo': update.photo.url if update.photo else None,
-            'doc': update.doc.url if update.doc else None,
+            'photo': update.photo.url if update.photo != 'null' else None,
+            'doc': update.doc.url if update.doc != 'null' else None,
             'posted_by': update.user.first_name + ' ' + update.user.last_name,
             'email': update.user.email
         })

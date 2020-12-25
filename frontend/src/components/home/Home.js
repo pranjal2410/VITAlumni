@@ -14,6 +14,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
+import NewsDialog from "./NewsDialog";
 
 const slides = [
     { id: 0, url: logo, color: 'white' },
@@ -61,10 +62,10 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '50px',
     },
     newsTable: {
-        height: 500,
+        height: 400,
         backgroundColor: theme.palette.background.paper,
         margin: 'auto',
-        width: 500,
+        width: 550,
         cursor: 'pointer',
     }
 }))
@@ -108,6 +109,9 @@ const GrowOnScroll = (props) => {
 const Home = () => {
     const classes = useStyles();
     const [news, setNews] = useState([]);
+    const [clicked, setClicked] = useState({});
+    const [newsDialog, setNewsDialog] = useState(false);
+
     useEffect(() => {
         axios({
             method: "GET",
@@ -125,6 +129,8 @@ const Home = () => {
 
     const handleNews = i => (e) => {
         console.log(news[i]);
+        setNewsDialog(true);
+        setClicked(news[i]);
     }
 
     return (
@@ -173,7 +179,7 @@ const Home = () => {
                         <Table className={classes.newsTable} aria-label="news table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>NEWS</TableCell>
+                                    <TableCell>NEWS TITLES</TableCell>
                                     <TableCell align="right">DATE POSTED</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -183,7 +189,7 @@ const Home = () => {
                                     return (
                                         <TableRow key={i} onClick={handleNews(i)}>
                                             <TableCell component="th" scope="row">
-                                                {notice.text}
+                                                {notice.title}
                                             </TableCell>
                                             <TableCell align="right">
                                                 {months[date.getUTCMonth()] + ' ' + date.getUTCDate() + ', ' + date.getUTCFullYear()}
@@ -201,8 +207,14 @@ const Home = () => {
                     <Typography className={classes.title}>
                         News & Notices
                     </Typography>
+                    <Typography component='p' variant='h5' color='textPrimary' style={{ marginLeft: '50px'}}>
+                        You can view all the news/notices posted here by the college staff or
+                        any other concerned authority. You can even find the documents and photos
+                        attached to a particular notice.
+                    </Typography>
                 </Grid>
             </GrowOnScroll>
+            <NewsDialog open={newsDialog} setOpen={setNewsDialog} news={clicked}/>
         </Grid>
     )
 }

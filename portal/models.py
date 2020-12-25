@@ -28,6 +28,7 @@ class Profile(models.Model):
 
 class Updates(models.Model):
     user = models.ForeignKey('authentication.User', on_delete=models.CASCADE, null=True)
+    title = models.CharField(max_length=100, null=True)
     text = models.TextField(blank=True, null=True)
     photo = models.ImageField(upload_to='alumni/photos', null=True, blank=True)
     doc = models.FileField(upload_to='alumni/docs', null=True, blank=True)
