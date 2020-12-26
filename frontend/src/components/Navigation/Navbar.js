@@ -84,6 +84,9 @@ const useStyles = makeStyles((theme) => ({
         zIndex: theme.zIndex.drawer + 1,
         color: '#fff',
     },
+    themer: {
+        color: theme.palette.text.primary
+    }
 }));
 
 export default function Navbar() {
@@ -259,7 +262,7 @@ export default function Navbar() {
                             <Divider />
                         </Drawer>
                     </Backdrop>
-                    <IconButton edge='end' color='textPrimary' onClick={toggleTheme}>
+                    <IconButton edge='end' className={classes.themer} onClick={toggleTheme}>
                         {dark ? <Brightness7/>: <Brightness4/>}
                     </IconButton>
                 </Toolbar>

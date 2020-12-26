@@ -128,7 +128,6 @@ const Home = () => {
     }, [])
 
     const handleNews = i => (e) => {
-        console.log(news[i]);
         setNewsDialog(true);
         setClicked(news[i]);
     }
