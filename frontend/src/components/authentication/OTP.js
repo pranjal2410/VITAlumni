@@ -86,12 +86,12 @@ export const OTP = ({ open, setOpen, setLoggedIn }) => {
     }
 
     const handleCancellation = () => {
-        enqueueSnackbar('Logging out....', {variant: 'info', key: 'logging_out'})
+        enqueueSnackbar('Logging out....', {variant: 'info', key: 'logging_out'});
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        setTimeout(() => closeSnackbar('logging_out'), 3000);
-        setTimeout(() => enqueueSnackbar('Logged out Successfully!', {variant: 'success', key: 'logged_out'}), 3000);
-        setTimeout(() => closeSnackbar('logged_out'), 6000);
-        setTimeout(() => setLoggedIn(false), 3000);
+        setTimeout(() => closeSnackbar('logging_out'), 2000);
+        setTimeout(() => enqueueSnackbar('Logged out Successfully!', {variant: 'success', key: 'logged_out'}), 2000);
+        setTimeout(() => closeSnackbar('logged_out'), 4000);
+        setTimeout(() => setLoggedIn(false), 2000);
         setOpen(false);
     }
 

@@ -14,7 +14,7 @@ class Branch(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField('authentication.User', on_delete=models.CASCADE, related_name='Alumni', null=True)
+    user = models.OneToOneField('authentication.User', on_delete=models.SET_NULL, related_name='Alumni', null=True)
     email = models.EmailField(unique=True, max_length=100)
     branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True)
     graduation = models.DateField(null=True, auto_now_add=False, auto_now=False)
@@ -49,4 +49,4 @@ class Connection(models.Model):
     approved = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.sender.user.email + ' ' + self.receiver + self.approved.__str__()
+        return self.sender.user.email + ' ' + self.receiver + ' ' + self.approved.__str__()

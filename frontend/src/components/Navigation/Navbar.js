@@ -185,7 +185,7 @@ export default function Navbar() {
     return (
         <>
             <AppBar position="sticky" className={clsx(classes.appBar, {[classes.appBarShift]: open})}>
-                <Toolbar style={{ width: '100%'}}>
+                <Toolbar style={{ width: '100%'}} variant='dense'>
                     <IconButton
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
@@ -268,7 +268,7 @@ export default function Navbar() {
                 </Toolbar>
             </AppBar>
             <Login open={login} setOpen={setLogin} setOTP={setOTP}/>
-            <SignUp open={signUp} setOpen={setSignUp} otp={otp} setOTP={setOTP}/>
+            <SignUp open={signUp} setOpen={setSignUp} setOTP={setOTP}/>
             <OTP open={otp} setOpen={setOTP} setLoggedIn={setLoggedIn}/>
             <PendingRequests open={pending} setOpen={setPending}/>
             <EditProfile open={edit} setOpen={setEdit}/>

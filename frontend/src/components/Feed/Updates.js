@@ -309,7 +309,7 @@ const Updates = () => {
                     </CardActions>
                 </Paper>
             </Box>
-            <Box style={{maxHeight: '100vh', padding: '10px', overflow: 'auto', overflowX: 'hidden', maxWidth: '34%'}}>
+            <Box style={{maxHeight: '100vh', padding: '10px', overflow: 'auto', overflowX: 'hidden', width: '34%'}}>
                 <Grid container spacing={3}>
                     <Grid item xs={12} id='back-to-top-anchor' ref={ref}>
                         <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={5}>

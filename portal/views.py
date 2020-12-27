@@ -31,6 +31,15 @@ class BranchListView(APIView):
         branches = Branch.objects.all()
         serializer = BranchSerializer(branches, many=True)
         serialized_branches = serializer.data
+        for branch in serialized_branches:
+            years = set([profile.graduation.year for profile in Profile.objects.filter(branch__name=branch['name'])])
+            history = []
+            for year in years:
+                history.append({
+                    'year': year,
+                    'total_registered': Profile.objects.filter(branch__name=branch['name'], graduation__year=year).count()
+                })
+            branch['history'] = history
         context = {
             'branches': serialized_branches,
             'success': True
@@ -268,8 +277,8 @@ def getFeed(user, all_feed=False, request_user=None):
         update_dict['created_on'] = update.created_on
         update_dict['user'] = update.user.first_name + ' ' + update.user.last_name
         update_dict['user_dp'] = update.user.profile_pic.photo.url if update.user.profile_pic else \
-        update.user.first_name[
-            0].upper()
+            update.user.first_name[
+                0].upper()
         update_dict['id'] = update.id
         update_dict['greets'] = len(update.profile_set.all())
         update_dict['by_self'] = update.user == user

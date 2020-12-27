@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, date
 
 from authentication.models import User
+from authentication.serializers import UserSerializer
 from .models import *
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
@@ -9,12 +10,10 @@ jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
-class BranchSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=50)
-    total_passed = serializers.IntegerField(default=0)
-    registered_passed = serializers.IntegerField(default=0)
-    total_staff = serializers.IntegerField(default=0)
-    registered_staff = serializers.IntegerField(default=0)
+class BranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = ['name', 'total_passed', 'registered_passed', 'total_staff', 'registered_staff']
 
 
 class UpdateSerializer(serializers.ModelSerializer):
@@ -70,3 +69,21 @@ class EditSerializer(serializers.Serializer):
             'branch': data['branch'],
             'email': data['email']
         }
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(required=True)
+
+    class Meta:
+        model = Profile
+        fields = ['email', 'graduation', 'user']
+
+    def update(self, profile, validated_data):
+        user_data = validated_data['user']
+        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+        profile.user = user
+        profile.graduation = validated_data['graduation']
+
+        profile.save()
+
+        return profile

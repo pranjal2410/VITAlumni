@@ -10,8 +10,9 @@ from rest_framework_jwt.settings import api_settings
 from rest_framework import status
 
 from portal.models import Profile
+from portal.serializers import ProfileSerializer
 from .models import *
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import LoginSerializer
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -29,23 +30,30 @@ class RegisterView(APIView):
                 'message': 'Profile related to this email not found'
             }
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
-        user_serializer = UserSerializer(data=request.data)
-        if user_serializer.is_valid(raise_exception=True):
-            user = user_serializer.save()
-            profile.user = user
-            user.save()
+        profile_serializer = ProfileSerializer(profile, data=request.data)
+        if profile_serializer.is_valid():
+            profile = profile_serializer.save()
+            branch = Branch.objects.get(name=request.data['branch'])
+            profile.branch = branch
             profile.save()
-            payload = jwt_payload_handler(user)
+            if profile.is_college_staff:
+                branch.registered_staff += 1
+            else:
+                branch.registered_passed += 1
+            branch.save()
+            payload = jwt_payload_handler(profile.user)
             token = jwt_encode_handler(payload)
 
             context = {
                 'message': 'Registered successfully!',
                 'token': token,
-                'is_otp_verified': user.otp_verified,
+                'is_otp_verified': profile.user.otp_verified,
                 'success': True
             }
 
             return Response(context, status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_424_FAILED_DEPENDENCY)
 
 
 class LoginView(APIView):

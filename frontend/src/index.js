@@ -9,7 +9,7 @@ import {ThemeContextProvider} from "./context/ThemeContext";
 
 ReactDOM.render(
     <ThemeContextProvider>
-        <SnackbarProvider>
+        <SnackbarProvider maxSnack={1}>
             <BrowserRouter>
                 <App />
             </BrowserRouter>

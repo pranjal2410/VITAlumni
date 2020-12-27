@@ -13,7 +13,7 @@ jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'password', 'contact']
+        fields = ['first_name', 'last_name', 'email', 'password', 'contact', 'birthday']
 
     def create(self, validated_data):
         user = User.objects.create_user(email=validated_data['email'], password=validated_data['password'])
@@ -21,6 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.first_name = validated_data['first_name']
         user.last_name = validated_data['last_name']
         user.contact = validated_data['contact']
+        user.birthday = validated_data['birthday']
         user.slug = slugify(user.first_name + user.last_name)
 
         user.save()

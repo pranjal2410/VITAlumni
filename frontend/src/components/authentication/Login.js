@@ -72,7 +72,7 @@ export const Login = ({ open, setOpen, setOTP }) => {
                 setErrors({...errors, loginError: false});
                 setOpen(false);
                 enqueueSnackbar('Logged In Successfully!', { variant: 'success', key: 'login_success'})
-                setTimeout(() => closeSnackbar('login_success'), 5000)
+                setTimeout(() => closeSnackbar('login_success'), 2000)
                 if(!response.data.is_otp_verified)
                 {
                     setOTP(true);
@@ -100,7 +100,7 @@ export const Login = ({ open, setOpen, setOTP }) => {
                 closeSnackbar('try_login')
                 setErrors({...errors, loginError: true});
                 enqueueSnackbar('Failed to log in', { variant: 'error', key: 'login_error'})
-                setTimeout(() => closeSnackbar('login_error'), 5000)
+                setTimeout(() => closeSnackbar('login_error'), 2000)
             })
         }
     }

@@ -13,7 +13,6 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -23,6 +22,9 @@ import MenuItem from "@material-ui/core/MenuItem";
 import {useLocation} from "react-router";
 import axios from "axios";
 import {Grow} from "@material-ui/core";
+import Collapse from "@material-ui/core/Collapse";
+import Box from "@material-ui/core/Box";
+import {KeyboardArrowDown, KeyboardArrowUp} from "@material-ui/icons";
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -59,7 +61,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-    const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+    const { classes, order, orderBy, onRequestSort } = props;
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
     };
@@ -67,14 +69,7 @@ function EnhancedTableHead(props) {
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
-                        checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{ 'aria-label': 'select all branches' }}
-                    />
-                </TableCell>
+                <TableCell/>
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
@@ -221,6 +216,74 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const useRowStyles = makeStyles({
+    root: {
+        '& > *': {
+            borderBottom: 'unset',
+        },
+    },
+});
+
+function Row(props) {
+    const { row } = props;
+    const [open, setOpen] = React.useState(false);
+    const classes = useRowStyles();
+
+    return (
+        <React.Fragment>
+            <TableRow
+                className={classes.root}
+                hover
+                role="checkbox"
+                tabIndex={-1}
+                key={row.name}
+            >
+                <TableCell>
+                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                        {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                    </IconButton>
+                </TableCell>
+                <TableCell component="th" scope="row">
+                    {row.name}
+                </TableCell>
+                <TableCell align="right">{row.total_passed}</TableCell>
+                <TableCell align="right">{row.registered_passed}</TableCell>
+                <TableCell align="right">{row.total_staff}</TableCell>
+                <TableCell align="right">{row.registered_staff}</TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Box margin={1}>
+                            <Typography variant="h6" gutterBottom component="div">
+                                History
+                            </Typography>
+                            <Table size="small" aria-label="purchases">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Year</TableCell>
+                                        <TableCell align="right">Total Registered</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {row.history.map((historyRow, i) => (
+                                        <TableRow key={i}>
+                                            <TableCell component="th" scope="row">
+                                                {historyRow.year}
+                                            </TableCell>
+                                            <TableCell align="right">{historyRow.total_registered}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </Box>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+        </React.Fragment>
+    );
+}
+
 export default function Sections() {
     const classes = useStyles();
     const location = useLocation();
@@ -246,26 +309,6 @@ export default function Sections() {
         setSelected([]);
     };
 
-    const handleClick = (event, name) => {
-        const selectedIndex = selected.indexOf(name);
-        let newSelected = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(
-                selected.slice(0, selectedIndex),
-                selected.slice(selectedIndex + 1),
-            );
-        }
-
-        setSelected(newSelected);
-    };
-
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -287,8 +330,6 @@ export default function Sections() {
             setRows(response.data.branches);
         })
     }, [location])
-
-    const isSelected = (name) => selected.indexOf(name) !== -1;
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
@@ -322,33 +363,8 @@ export default function Sections() {
                                 {stableSort(rows, getComparator(order, orderBy))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row, index) => {
-                                        const isItemSelected = isSelected(row.name);
-                                        const labelId = `enhanced-table-checkbox-${index}`;
-
                                         return (
-                                            <TableRow
-                                                hover
-                                                onClick={(event) => handleClick(event, row.name)}
-                                                role="checkbox"
-                                                aria-checked={isItemSelected}
-                                                tabIndex={-1}
-                                                key={row.name}
-                                                selected={isItemSelected}
-                                            >
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        checked={isItemSelected}
-                                                        inputProps={{ 'aria-labelledby': labelId }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell component="th" id={labelId} scope="row" padding="none">
-                                                    {row.name}
-                                                </TableCell>
-                                                <TableCell align="right">{row.total_passed}</TableCell>
-                                                <TableCell align="right">{row.registered_passed}</TableCell>
-                                                <TableCell align="right">{row.total_staff}</TableCell>
-                                                <TableCell align="right">{row.registered_staff}</TableCell>
-                                            </TableRow>
+                                            <Row key={row.name} row={row} />
                                         );
                                     })}
                                 {emptyRows > 0 && (
