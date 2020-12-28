@@ -63,6 +63,15 @@ const useStyles = makeStyles((theme) => ({
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
     },
+    container: {
+        margin: 'auto',
+        padding: '20px',
+        width: '75vw',
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        borderRadius: '5px',
+        marginTop: '10px',
+    }
 }));
 
 const Search = () => {
@@ -142,7 +151,7 @@ const Search = () => {
 
     return (
         <>
-            <Collapse in={!submitted}>
+            <Collapse in={!submitted} timeout={1500}>
                 <Grid
                     container
                     direction = "column"
@@ -206,7 +215,12 @@ const Search = () => {
             </Collapse>
             <Collapse in={submitted}>
                 {people.length > 0?(
-                    <Grid container spacing={3} style={{ margin: 'auto', padding: '20px', width: '75vw'}}>
+                    <Grid container spacing={3} className={classes.container}>
+                        <Grid item xs={12}>
+                            <Typography align='center' component='h3' variant='h3'>
+                                Your search results
+                            </Typography>
+                        </Grid>
                         {people.map((person, i) => {
                             return (
                                 <Grid item key={i} xs={12} md={4} lg={4}>
@@ -242,11 +256,25 @@ const Search = () => {
                                 </Grid>
                             )
                         })}
+                        <Grid item xs={12} style={{ marginTop: '20px'}}>
+                            <Button onClick={() => setSubmitted(!submitted)} variant="contained" fullWidth color='primary'>
+                                Go Back
+                            </Button>
+                        </Grid>
                     </Grid>
                 ):(
-                    <Typography variant="h2" component="h2">
-                        No results found for the name you entered.
-                    </Typography>
+                    <Grid container style={{margin: 'auto', marginTop: '10px', padding: '20px', width: '75vw'}}>
+                        <Grid item xs={12}>
+                            <Typography variant="h3" component="h3" align="center">
+                                No results found for the name you entered
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} style={{ marginTop: '20px'}}>
+                            <Button onClick={() => setSubmitted(!submitted)} variant="contained" fullWidth color='primary'>
+                                Go Back
+                            </Button>
+                        </Grid>
+                    </Grid>
                 )}
             </Collapse>
         </>

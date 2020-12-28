@@ -73,6 +73,11 @@ class FeedView(APIView):
             update.user = request.user
 
             update.save()
+            if update.is_profile_pic:
+                update.user.profile_pic = update
+            elif update.is_cover_pic:
+                update.user.cover_pic = update
+            update.user.save()
 
             context = {
                 'success': True,

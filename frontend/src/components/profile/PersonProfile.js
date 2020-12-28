@@ -8,17 +8,15 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Paper from "@material-ui/core/Paper";
 import img from './background-cover.png';
 import Typography from "@material-ui/core/Typography";
-import Box from "@material-ui/core/Box";
 import IconButton from "@material-ui/core/IconButton";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import {Link} from "react-router-dom";
+import {Link} from "@material-ui/core";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbUpOutlinedIcon from "@material-ui/icons/ThumbUpOutlined";
 import Fade from "@material-ui/core/Fade";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
+import TextField from "@material-ui/core/TextField";
+import DateFnsUtils from "@date-io/date-fns";
+import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -30,7 +28,6 @@ const useStyles = makeStyles(theme => ({
     },
     title: {
         color: theme.palette.text.primary,
-        marginTop: '10px'
     },
     spinner: {
         display: 'flex',
@@ -40,12 +37,13 @@ const useStyles = makeStyles(theme => ({
         justifyContent: 'center',
     },
     bannerBackground: {
-        width: '50vw',
+        width: '100%',
         height: '50vh',
         borderRadius: '5px',
         display: 'flex',
         justifyContent: 'center',
         borderStyle: 'solid',
+        borderWidth: '1px',
         borderColor: 'white',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
@@ -54,12 +52,13 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(38),
         backgroundColor: orange[900],
         color: 'white',
-        width: theme.spacing(15),
+        width: theme.spacing(12),
         boxShadow: theme.shadows[10],
         fontSize: 50,
         borderStyle: 'solid',
+        borderWidth: '1px',
         borderColor: 'white',
-        height: theme.spacing(15),
+        height: theme.spacing(12),
     },
     feedAvatar: {
         backgroundColor: green[500],
@@ -73,8 +72,9 @@ const useStyles = makeStyles(theme => ({
         borderRadius: '10px',
     },
     table: {
-        marginTop: '10px',
-        maxWidth: '100%',
+        width: '70%',
+        marginTop: '20px',
+        padding: '20px',
         backgroundColor: theme.palette.background.paper,
         color: theme.palette.text.primary
     },
@@ -85,7 +85,6 @@ const PersonProfile = (props) => {
     const [profile, setProfile] = React.useState({});
     const [feed, setFeed] = React.useState([]);
     const [spinner, setSpinner] = React.useState(true);
-    let i=0;
 
     React.useEffect(() => {
         axios({
@@ -159,9 +158,9 @@ const PersonProfile = (props) => {
         </div>
     ):(
         <div className={classes.root}>
-            <Fade in={true} timeout={1000}>
-                <div style={{display: 'flex'}}>
-                    <Box style={{maxHeight: '100vh', margin: '20px', padding: '10px'}}>
+            <Grid container spacing={3} alignItems={'center'}>
+                <Fade in={true} timeout={1000}>
+                    <Grid item xs={6}>
                         <Paper className={classes.bannerBackground} elevation={15} style={{ backgroundImage: profile.cover_pic?`url(${profile.cover_pic})`:`url(${img})`}}>
                             {profile.profile_pic?(
                                 <Avatar src={profile.profile_pic} alt={profile.name} className={classes.avatar}/>
@@ -169,8 +168,10 @@ const PersonProfile = (props) => {
                                 <Avatar className={classes.avatar}>{profile.name.slice(0,1)}</Avatar>
                             )}
                         </Paper>
-                    </Box>
-                    <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto'}}>
+                    </Grid>
+                </Fade>
+                <Fade in={true} timeout={2000}>
+                    <Grid item xs={6}>
                         <Typography className={classes.title} component='h4' variant='h2'>{profile.name}</Typography>
                         {profile.is_approved?(
                             <Typography className={classes.title} component='h4' variant='h4'>
@@ -185,108 +186,130 @@ const PersonProfile = (props) => {
                                 Send Request
                             </Button>
                         )}
-
-                        <div className={classes.table}>
-                            <Table stickyHeader>
-                                <TableBody>
-                                    <TableRow key={i++}>
-                                        <TableCell>Email:</TableCell>
-                                        <TableCell>
-                                            <a href={"mailto:"+profile.email} style={{ color: 'white' }}>{profile.email}</a>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow key={i++}>
-                                        <TableCell>Home Team</TableCell>
-                                        <TableCell>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow key={i++}>
-                                        <TableCell>Away Team</TableCell>
-                                        <TableCell>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow key={i++}>
-                                        <TableCell>Winner</TableCell>
-                                        <TableCell>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow key={i++}>
-                                        <TableCell>Winning criteria</TableCell>
-                                        <TableCell>
-                                            Jai Hind
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </Box>
-                </div>
-            </Fade>
-            <Fade in={true} timeout={3000}>
-                <Typography className={classes.title} variant='h4' style={{textAlign: 'center', marginTop: '75px', overflow: 'visible'}}>
-                    Updates posted by {profile.name}:
-                </Typography>
-            </Fade>
-            <Fade in={true} timeout={3000}>
-                <Box style={{ maxHeight: '80vh', overflow: 'auto', marginTop: '20px', overflowX: 'hidden'}}>
-                    <Grid container spacing={3}>
-                        {feed.map((update, i) => {
-                            const date = new Date(update.created_on);
-                            return (
-                                <Grid item xs={12} key={i}>
-                                    <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={10} id={'paper'+i}>
-                                        <CardHeader
-                                            avatar={
-                                                <Avatar aria-label={update.user} className={classes.feedAvatar} src={update.user_dp} />
-                                            }
-                                            action={update.by_self?(
-                                                <>
-                                                    <IconButton aria-label="settings">
-                                                        <MoreVertIcon />
-                                                    </IconButton>
-                                                </>
-                                            ):null}
-                                            title={update.is_profile_pic?update.user + ' updated their profile picture':
-                                            update.is_cover_pic?update.user + ' updated their cover picture':
-                                            update.is_job_update?update.user + ' added a job update':update.user}
-                                            subheader={months[date.getUTCMonth()] + ' ' + date.getUTCDate() + ', ' + date.getUTCFullYear()}
-                                        />
-                                        <CardContent>
-                                            {update.text!=='null'?(
-                                                <Typography variant="body2" color="textSecondary" component="p">
-                                                    {update.text}
-                                                </Typography>
-                                            ):null}
-                                            {update.photo?(
-                                                <CardMedia
-                                                    className={classes.photo}
-                                                    component='img'
-                                                    image={update.photo}
-                                                />
-                                            ):null}
-                                            {update.doc?(
-                                                <>
-                                                    <br/>
-                                                    <Link to='#' className={classes.link} onClick={() => window.open('http://localhost:8000'+update.doc)}>Click here to download the document</Link>
-                                                </>
-                                            ):null}
-                                        </CardContent>
-                                        <CardActions>
-                                            <Button size="medium" color="primary" startIcon={update.is_greeted?(<ThumbUpIcon/>):(<ThumbUpOutlinedIcon/>)} onClick={handleGreet(i)}>
-                                                {update.is_greeted?('UnGreet'):('Greet')}
-                                            </Button>
-                                        </CardActions>
-                                        <CardContent>
-                                            <Typography variant="body2" color="textSecondary" component="p">
-                                                {update.greets} people have greeted this.
-                                            </Typography>
-                                        </CardContent>
-                                    </Paper>
-                                </Grid>)
-                        })}
+                        <Paper elevation={10} className={classes.table}>
+                            <Link href={'mailto:'+profile.email} color='textPrimary'>
+                                <TextField
+                                    color='primary'
+                                    label={'Email'}
+                                    defaultValue={profile.email}
+                                    fullWidth
+                                    disabled
+                                    margin='normal'
+                                    variant='outlined'
+                                />
+                            </Link>
+                            <TextField
+                                color='primary'
+                                label={'Branch'}
+                                defaultValue={profile.branch}
+                                fullWidth
+                                disabled
+                                margin='normal'
+                                variant='outlined'
+                            />
+                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                <KeyboardDatePicker
+                                    clearable
+                                    value={(new Date(profile.date_joined))}
+                                    label='Date Registered'
+                                    inputVariant={'outlined'}
+                                    disabled
+                                    format="MM/dd/yyyy"
+                                    margin="normal"
+                                    fullWidth
+                                />
+                                <KeyboardDatePicker
+                                    clearable
+                                    value={(new Date(profile.graduation))}
+                                    label='Graduation Date'
+                                    inputVariant={'outlined'}
+                                    disabled
+                                    format="MM/dd/yyyy"
+                                    margin="normal"
+                                    fullWidth
+                                />
+                                <KeyboardDatePicker
+                                    clearable
+                                    value={(new Date(profile.birthday))}
+                                    label='Date of Birth'
+                                    inputVariant={'outlined'}
+                                    disabled
+                                    format="MM/dd/yyyy"
+                                    margin="normal"
+                                    fullWidth
+                                />
+                            </MuiPickersUtilsProvider>
+                        </Paper>
                     </Grid>
-                </Box>
-            </Fade>
+                </Fade>
+                <Grid item xs={12}>
+                    <Fade in={true} timeout={3000}>
+                        <Typography className={classes.title} variant='h4' style={{textAlign: 'center', marginTop: '75px', overflow: 'visible'}}>
+                            Updates posted by {profile.name}:
+                        </Typography>
+                    </Fade>
+                </Grid>
+                <Fade in={true} timeout={3000}>
+                    <Grid container style={{ maxHeight: '80vh', overflow: 'auto', marginTop: '20px', overflowX: 'hidden'}}>
+                        <Grid container spacing={3}>
+                            {feed.map((update, i) => {
+                                const date = new Date(update.created_on);
+                                return (
+                                    <Grid item xs={12} key={i}>
+                                        <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={10} id={'paper'+i}>
+                                            <CardHeader
+                                                avatar={
+                                                    <Avatar aria-label={update.user} className={classes.feedAvatar} src={update.user_dp} />
+                                                }
+                                                action={update.by_self?(
+                                                    <>
+                                                        <IconButton aria-label="settings">
+                                                            <MoreVertIcon />
+                                                        </IconButton>
+                                                    </>
+                                                ):null}
+                                                title={update.is_profile_pic?update.user + ' updated their profile picture':
+                                                    update.is_cover_pic?update.user + ' updated their cover picture':
+                                                        update.is_job_update?update.user + ' added a job update':update.user}
+                                                subheader={months[date.getUTCMonth()] + ' ' + date.getUTCDate() + ', ' + date.getUTCFullYear()}
+                                            />
+                                            <CardContent>
+                                                {update.text!=='null'?(
+                                                    <Typography variant="body2" color="textSecondary" component="p">
+                                                        {update.text}
+                                                    </Typography>
+                                                ):null}
+                                                {update.photo?(
+                                                    <CardMedia
+                                                        className={classes.photo}
+                                                        component='img'
+                                                        image={update.photo}
+                                                    />
+                                                ):null}
+                                                {update.doc?(
+                                                    <>
+                                                        <br/>
+                                                        <Link to='#' className={classes.link} onClick={() => window.open('http://localhost:8000'+update.doc)}>Click here to download the document</Link>
+                                                    </>
+                                                ):null}
+                                            </CardContent>
+                                            <CardActions>
+                                                <Button size="medium" color="primary" startIcon={update.is_greeted?(<ThumbUpIcon/>):(<ThumbUpOutlinedIcon/>)} onClick={handleGreet(i)}>
+                                                    {update.is_greeted?('UnGreet'):('Greet')}
+                                                </Button>
+                                            </CardActions>
+                                            <CardContent>
+                                                <Typography variant="body2" color="textSecondary" component="p">
+                                                    {update.greets} people have greeted this.
+                                                </Typography>
+                                            </CardContent>
+                                        </Paper>
+                                    </Grid>)
+                            })}
+                        </Grid>
+                    </Grid>
+                </Fade>
+            </Grid>
         </div>
     )
 }

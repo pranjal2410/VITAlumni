@@ -185,7 +185,7 @@ export default function Navbar() {
     return (
         <>
             <AppBar position="sticky" className={clsx(classes.appBar, {[classes.appBarShift]: open})}>
-                <Toolbar style={{ width: '100%'}} variant='dense'>
+                <Toolbar style={{ width: '100%'}}>
                     <IconButton
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}

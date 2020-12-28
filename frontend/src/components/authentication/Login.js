@@ -12,9 +12,11 @@ import useTheme from "@material-ui/core/styles/useTheme";
 import axios from 'axios';
 import { useSnackbar } from "notistack";
 import {getToken, setCookie} from "./cookies";
+import {useHistory} from "react-router";
 
 export const Login = ({ open, setOpen, setOTP }) => {
     const theme = useTheme();
+    const history = useHistory();
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();
     const [values, setValues] = useState({
         email: null,
@@ -69,6 +71,9 @@ export const Login = ({ open, setOpen, setOTP }) => {
             }).then(response => {
                 closeSnackbar('try_login')
                 setCookie(response.data.token, 'token');
+                setTimeout(() => {
+                    history.push('/');
+                }, 120*60*1000);
                 setErrors({...errors, loginError: false});
                 setOpen(false);
                 enqueueSnackbar('Logged In Successfully!', { variant: 'success', key: 'login_success'})
@@ -147,7 +152,6 @@ export const Login = ({ open, setOpen, setOTP }) => {
                         }}
                         error={errors.passwordError || errors.loginError}
                         fullWidth
-                        autoFocus
                         required
                     />
                 </DialogContent>

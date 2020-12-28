@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
@@ -14,11 +14,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
 import {useLocation} from "react-router";
 import axios from "axios";
 import {Grow} from "@material-ui/core";
@@ -129,15 +124,6 @@ const useToolbarStyles = makeStyles((theme) => ({
 const EnhancedTableToolbar = (props) => {
     const classes = useToolbarStyles();
     const { numSelected } = props;
-    const [open, setOpen] = useState(null);
-
-    const handleFilterMenu = (e) => {
-        setOpen(e.currentTarget)
-    }
-
-    const handleFilterMenuClose = (e) => {
-        setOpen(null)
-    }
 
     return (
         <Toolbar
@@ -155,30 +141,6 @@ const EnhancedTableToolbar = (props) => {
                 </Typography>
             )}
 
-            {numSelected > 0 ? (
-                <Tooltip title="Delete">
-                    <IconButton aria-label="delete">
-                        <DeleteIcon />
-                    </IconButton>
-                </Tooltip>
-            ) : (
-                <Tooltip title="Filter list">
-                    <IconButton aria-label="filter list" onClick={handleFilterMenu}>
-                        <FilterListIcon />
-                    </IconButton>
-                </Tooltip>
-            )}
-            <Menu
-                id="simple-menu"
-                anchorEl={open}
-                keepMounted
-                open={Boolean(open)}
-                onClose={handleFilterMenuClose}
-            >
-                <MenuItem onClick={handleFilterMenuClose}>Profile</MenuItem>
-                <MenuItem onClick={handleFilterMenuClose}>My account</MenuItem>
-                <MenuItem onClick={handleFilterMenuClose}>Logout</MenuItem>
-            </Menu>
         </Toolbar>
     );
 };

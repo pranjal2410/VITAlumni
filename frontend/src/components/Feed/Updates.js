@@ -28,14 +28,14 @@ import Zoom from "@material-ui/core/Zoom";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 import Fab from "@material-ui/core/Fab";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import Checkbox from "@material-ui/core/Checkbox";
-import useTheme from "@material-ui/core/styles/useTheme";
 import Box from "@material-ui/core/Box";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
 import List from "@material-ui/core/List";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {Grow} from "@material-ui/core";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -110,7 +110,6 @@ function ScrollTop(props) {
 
 const Updates = () => {
     let history = useHistory();
-    const theme = useTheme();
     const ref = React.useRef(null);
     if(!getToken())
         history.push('/sections');
@@ -127,7 +126,7 @@ const Updates = () => {
         photo: null,
         photoFile: null,
         text: '',
-        is_profile_pic: false,
+        updateType: 'normal',
     });
 
     React.useEffect(() => {
@@ -146,7 +145,6 @@ const Updates = () => {
             setProfile(response.data.user_data);
             setConnection_list(response.data.connection_list)
         }).catch(error => {
-            console.log(error.response.data)
         })
     }, [location, submit])
 
@@ -205,19 +203,16 @@ const Updates = () => {
     }
 
     const handleChange = (e) => {
-        if(e.target.id === 'text'){
+        if(e.target.id){
             setPost({
                 ...post,
                 [e.target.id]: e.target.value
             })
-        }
-        else {
-            let val;
-            if(e.target.id === 'is_profile_pic')
-                val = post.is_profile_pic;
+        } else {
             setPost({
                 ...post,
-                [e.target.id]: !val,
+                [e.target.name]: e.target.value,
+                text: e.target.value==='job_update'?'Started working at ':post.text,
             })
         }
     }
@@ -227,6 +222,10 @@ const Updates = () => {
         data.append('text', post.text);
         data.append('photo', post.photoFile);
         data.append('doc', post.docFile);
+        data.append('is_profile_pic', post.updateType === 'profile_picture');
+        data.append('is_cover_pic', post.updateType === 'cover_picture');
+        data.append('is_job_update', post.updateType ==='job_update');
+        data.append('is_notice', post.updateType === 'notice');
 
         axios({
             method: 'post',
@@ -248,7 +247,6 @@ const Updates = () => {
             })
             setSubmit(true);
         }).catch(err => {
-            console.log(err.response.data)
         })
     }
 
@@ -273,7 +271,6 @@ const Updates = () => {
             url: '/portal/greet/'
         }).then(response => {
         }).catch(err => {
-            console.log(err.response.data)
         })
     }
 
@@ -283,190 +280,206 @@ const Updates = () => {
         </div>
     ):(
         <div className={classes.root}>
-            <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto', overflowX: 'hidden', maxWidth: '33%'}}>
-                <Paper style={{ maxWidth: 350, margin: 'auto' }} elevation={10}>
-                    <CardContent>
-                        {profile.profile_pic?(
-                            <CardMedia
-                                className={classes.media}
-                                image={profile.profile_pic}
-                                component='img'
-                                title={profile.name}
-                            />
-                        ):null}
-                        <Typography gutterBottom variant="h5" component="h2" style={{ marginTop: '5px'}}>
-                            {profile.name}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary" component="p">
-                            Hello {profile.name}! You can check out the latest feed here by clicking on the 'FEED' tab.
-                            If you want to check your own profile, please click on the 'USER PROFILE' tab!
-                        </Typography>
-                    </CardContent>
-                    <CardActions>
-                        <Button size="small" color="primary" onClick={() => history.push('/profile')}>
-                            View Profile
-                        </Button>
-                    </CardActions>
-                </Paper>
-            </Box>
-            <Box style={{maxHeight: '100vh', padding: '10px', overflow: 'auto', overflowX: 'hidden', width: '34%'}}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} id='back-to-top-anchor' ref={ref}>
-                        <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={5}>
-                            <CardContent>
-                                <Typography gutterBottom variant="h5" component="h2">
-                                    Add an update
-                                </Typography>
-                                <TextField
-                                    color='primary'
-                                    multiline={true}
-                                    onChange={handleChange}
-                                    type='text'
-                                    id='text'
-                                    name='text'
-                                    fullWidth
-                                    value={post.text}
-                                    margin='dense'
-                                    label='Write something...'
-                                    size='medium'
-                                    rows={4}
-                                    variant='outlined'
+            <Grow in={true} timeout={1500}>
+                <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto', overflowX: 'hidden', maxWidth: '33%'}}>
+                    <Paper style={{ maxWidth: 350, margin: 'auto' }} elevation={10}>
+                        <CardContent>
+                            {profile.profile_pic?(
+                                <CardMedia
+                                    className={classes.media}
+                                    image={profile.profile_pic}
+                                    component='img'
+                                    title={profile.name}
                                 />
-                                {post.photo!==null?(
-                                    <img
-                                        className={classes.photo}
-                                        width='100%'
-                                        src={post.photo}
-                                        alt='media'
-                                    />
-                                ):null}
-                                {post.doc!==null?(
-                                    <TextField
-                                        value={post.doc.name}
-                                        fullWidth
-                                        color='primary'
-                                        variant='outlined'
-                                        style={{ marginTop: '10px' }}
-                                        disabled
-                                    />
-                                ):null}
-                            </CardContent>
-                            <CardActions disableSpacing>
-                                <Tooltip title={post.photo!==null?'Detach photo':'Attach photo'} arrow placement='top'>
-                                    <IconButton color='inherit' component={post.photo!==null?'button':'label'} onClick={handlePicClick}>
-                                        {post.photo!==null?(<PhotoIcon/>):(<PhotoOutlinedIcon/>)}
-                                        {post.photo===null?(
-                                            <input type='file' accept='image/*' onChange={handlePicUpload} hidden/>
-                                        ):null}
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title='Attach document' arrow placement='top'>
-                                    <IconButton color='inherit' component={post.doc!==null?'button':'label'} onClick={handleDocClick} disabled={post.is_profile_pic}>
-                                        {post.doc!==null?(<AssignmentIcon/>):(<AssignmentOutlinedIcon/>)}
-                                        {post.doc===null?(
-                                            <input type='file' onChange={handleDocUpload} hidden/>
-                                        ):null}
-                                    </IconButton>
-                                </Tooltip>
-                                <Checkbox
-                                    checked={post.is_profile_pic}
-                                    onChange={handleChange}
-                                    disabled={post.doc!==null}
-                                    style={post.doc===null?{color: theme.palette.text.primary}:{color: theme.palette.text.secondary}}
-                                    id='is_profile_pic'
-                                    name='is_profile_pic'
-                                    inputProps={{ 'aria-label': 'Select if profile picture update' }}
-                                />
-                            </CardActions>
-                            <CardActions>
-                                <Button size="small" color="primary" onClick={handleSubmit}>
-                                    POST
-                                </Button>
-                            </CardActions>
-                        </Paper>
-                    </Grid>
-                    {feed.map((update, i) => {
-                        const date = new Date(update.created_on);
-                        return (
-                        <Grid item xs={12} key={i}>
-                            <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={10} id={'paper'+i}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar aria-label={update.user} className={classes.avatar} src={update.user_dp}>{update.user_dp}</Avatar>
-                                    }
-                                    action={update.by_self?(
-                                        <>
-                                            <IconButton aria-label="settings">
-                                                <MoreVertIcon />
-                                            </IconButton>
-                                        </>
-                                    ):null}
-                                    title={update.is_profile_pic?update.user + ' updated their profile picture':
-                                    update.is_cover_pic?update.user + ' updated their cover picture':
-                                    update.is_job_update?update.user + ' added a job update':update.user}
-                                    subheader={months[date.getUTCMonth()] + ' ' + date.getUTCDate() + ', ' + date.getUTCFullYear()}
-                                />
+                            ):null}
+                            <Typography gutterBottom variant="h5" component="h2" style={{ marginTop: '5px'}}>
+                                {profile.name}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                Hello {profile.name}! You can check out the latest feed here by clicking on the 'FEED' tab.
+                                If you want to check your own profile, please click on the 'USER PROFILE' tab!
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button size="small" color="primary" onClick={() => history.push('/profile')}>
+                                View Profile
+                            </Button>
+                        </CardActions>
+                    </Paper>
+                </Box>
+            </Grow>
+            <Grow in={true} timeout={3000}>
+                <Box style={{maxHeight: '100vh', padding: '10px', overflow: 'auto', overflowX: 'hidden', width: '34%'}}>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} id='back-to-top-anchor' ref={ref}>
+                            <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={5}>
                                 <CardContent>
-                                    {update.text!=='null'?(
-                                        <Typography variant="body2" color="textSecondary" component="p">
-                                            {update.text}
-                                        </Typography>
-                                    ):null}
-                                    {update.photo?(
-                                        <CardMedia
+                                    <Typography gutterBottom variant="h5" component="h2">
+                                        Add an update
+                                    </Typography>
+                                    <TextField
+                                        color='primary'
+                                        multiline={true}
+                                        onChange={handleChange}
+                                        type='text'
+                                        id='text'
+                                        name='text'
+                                        fullWidth
+                                        value={post.text}
+                                        margin='dense'
+                                        label='Write something...'
+                                        size='medium'
+                                        rows={4}
+                                        variant='outlined'
+                                    />
+                                    {post.photo!==null?(
+                                        <img
                                             className={classes.photo}
-                                            component='img'
-                                            image={update.photo}
+                                            width='100%'
+                                            src={post.photo}
+                                            alt='media'
                                         />
                                     ):null}
-                                    {update.doc?(
-                                        <>
-                                            <br/>
-                                            <Link to='#' className={classes.link} onClick={() => window.open('http://localhost:8000'+update.doc)}>Click here to download the document</Link>
-                                        </>
+                                    {post.doc!==null?(
+                                        <TextField
+                                            value={post.doc.name}
+                                            fullWidth
+                                            color='primary'
+                                            variant='outlined'
+                                            style={{ marginTop: '10px' }}
+                                            disabled
+                                        />
                                     ):null}
                                 </CardContent>
+                                <CardActions disableSpacing>
+                                    <Tooltip title={post.photo!==null?'Detach photo':'Attach photo'} arrow placement='top'>
+                                        <IconButton color='inherit' component={post.photo!==null?'button':'label'} onClick={handlePicClick}>
+                                            {post.photo!==null?(<PhotoIcon/>):(<PhotoOutlinedIcon/>)}
+                                            {post.photo===null?(
+                                                <input type='file' accept='image/*' onChange={handlePicUpload} hidden/>
+                                            ):null}
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title='Attach document' arrow placement='top'>
+                                        <IconButton color='inherit' component={post.doc!==null?'button':'label'} onClick={handleDocClick} disabled={post.is_profile_pic}>
+                                            {post.doc!==null?(<AssignmentIcon/>):(<AssignmentOutlinedIcon/>)}
+                                            {post.doc===null?(
+                                                <input type='file' onChange={handleDocUpload} hidden/>
+                                            ):null}
+                                        </IconButton>
+                                    </Tooltip>
+                                    <TextField
+                                        id="updateType"
+                                        select
+                                        label="Select Update Type"
+                                        value={post.updateType}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        name="updateType"
+                                        fullWidth
+                                        margin='normal'
+                                    >
+                                        <MenuItem value='normal'>Normal Update</MenuItem>
+                                        <MenuItem value='profile_picture'>Profile Picture</MenuItem>
+                                        <MenuItem value='cover_picture'>Cover Picture</MenuItem>
+                                        <MenuItem value='job_update'>Job Update</MenuItem>
+                                        {profile.is_staff?(
+                                            <MenuItem value='notice'>Notice</MenuItem>
+                                        ):null}
+                                    </TextField>
+                                </CardActions>
                                 <CardActions>
-                                    <Button size="medium" color="primary" startIcon={update.is_greeted?(<ThumbUpIcon/>):(<ThumbUpOutlinedIcon/>)} onClick={handleGreet(i)}>
-                                        {update.is_greeted?('UnGreet'):('Greet')}
+                                    <Button size="small" color="primary" onClick={handleSubmit}>
+                                        POST
                                     </Button>
                                 </CardActions>
-                                <CardContent>
-                                    <Typography variant="body2" color="textSecondary" component="p">
-                                        {update.greets} people have greeted this.
-                                    </Typography>
-                                </CardContent>
                             </Paper>
-                        </Grid>)
-                    })}
-                </Grid>
-                <ScrollTop>
-                    <Tooltip title='Back to top'>
-                        <Fab size="medium" aria-label="scroll back to top" className={classes.fab} color='inherit'>
-                            <KeyboardArrowUpIcon />
-                        </Fab>
-                    </Tooltip>
-                </ScrollTop>
-            </Box>
-            <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto', overflowX: 'hidden', maxWidth: '33%'}}>
-                <Paper style={{ maxWidth: 500, margin: 'auto', padding: '20px' }} elevation={10}>
-                    <Typography variant="h4" component='h4' color="textPrimary">
-                        Your connection list:
-                    </Typography>
-                    <List style={{ overflow: 'auto'}}>
-                        {connection_list.map((connection, i) => {
+                        </Grid>
+                        {feed.map((update, i) => {
+                            const date = new Date(update.created_on);
                             return (
-                                <ListItem key={i}>
-                                    <ListItemAvatar>
-                                        <Avatar aria-label={connection.name} className={classes.avatar} src={connection.profile_pic}/>
-                                    </ListItemAvatar>
-                                    <ListItemText primary={<Link to={'/person/'+connection.slug} className={classes.link}>{connection.name}</Link>}/>
-                                </ListItem>
-                            )
+                                <Grid item xs={12} key={i}>
+                                    <Paper style={{ maxWidth: 500, margin: 'auto' }} elevation={10} id={'paper'+i}>
+                                        <CardHeader
+                                            avatar={
+                                                <Avatar aria-label={update.user} className={classes.avatar} src={update.user_dp}>{update.user_dp}</Avatar>
+                                            }
+                                            action={update.by_self?(
+                                                <>
+                                                    <IconButton aria-label="settings">
+                                                        <MoreVertIcon />
+                                                    </IconButton>
+                                                </>
+                                            ):null}
+                                            title={update.is_profile_pic?update.user + ' updated their profile picture':
+                                                update.is_cover_pic?update.user + ' updated their cover picture':
+                                                    update.is_job_update?update.user + ' added a job update':update.user}
+                                            subheader={months[date.getUTCMonth()] + ' ' + date.getUTCDate() + ', ' + date.getUTCFullYear()}
+                                        />
+                                        <CardContent>
+                                            {update.text!=='null'?(
+                                                <Typography variant="body2" color="textSecondary" component="p">
+                                                    {update.text}
+                                                </Typography>
+                                            ):null}
+                                            {update.photo?(
+                                                <CardMedia
+                                                    className={classes.photo}
+                                                    component='img'
+                                                    image={update.photo}
+                                                />
+                                            ):null}
+                                            {update.doc?(
+                                                <>
+                                                    <br/>
+                                                    <Link to='#' className={classes.link} onClick={() => window.open('http://localhost:8000'+update.doc)}>Click here to download the document</Link>
+                                                </>
+                                            ):null}
+                                        </CardContent>
+                                        <CardActions>
+                                            <Button size="medium" color="primary" startIcon={update.is_greeted?(<ThumbUpIcon/>):(<ThumbUpOutlinedIcon/>)} onClick={handleGreet(i)}>
+                                                {update.is_greeted?('UnGreet'):('Greet')}
+                                            </Button>
+                                        </CardActions>
+                                        <CardContent>
+                                            <Typography variant="body2" color="textSecondary" component="p">
+                                                {update.greets} people have greeted this.
+                                            </Typography>
+                                        </CardContent>
+                                    </Paper>
+                                </Grid>)
                         })}
-                    </List>
-                </Paper>
-            </Box>
+                    </Grid>
+                    <ScrollTop>
+                        <Tooltip title='Back to top'>
+                            <Fab size="medium" aria-label="scroll back to top" className={classes.fab} color='inherit'>
+                                <KeyboardArrowUpIcon />
+                            </Fab>
+                        </Tooltip>
+                    </ScrollTop>
+                </Box>
+            </Grow>
+            <Grow in={true} timeout={4500}>
+                <Box style={{maxHeight: '80vh', margin: '20px', padding: '10px', overflow: 'auto', overflowX: 'hidden', maxWidth: '33%'}}>
+                    <Paper style={{ maxWidth: 500, margin: 'auto', padding: '20px' }} elevation={10}>
+                        <Typography variant="h4" component='h4' color="textPrimary">
+                            Your connection list:
+                        </Typography>
+                        <List style={{ overflow: 'auto'}}>
+                            {connection_list.map((connection, i) => {
+                                return (
+                                    <ListItem key={i}>
+                                        <ListItemAvatar>
+                                            <Avatar aria-label={connection.name} className={classes.avatar} src={connection.profile_pic}/>
+                                        </ListItemAvatar>
+                                        <ListItemText primary={<Link to={'/person/'+connection.slug} className={classes.link}>{connection.name}</Link>}/>
+                                    </ListItem>
+                                )
+                            })}
+                        </List>
+                    </Paper>
+                </Box>
+            </Grow>
         </div>
     )
 }
