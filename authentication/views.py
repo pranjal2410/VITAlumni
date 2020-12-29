@@ -103,7 +103,8 @@ class VerifyView(APIView):
                 f"Dear {request.user.first_name} {request.user.last_name},\nThe One Time Password required for "
                 f"verification of email provided - {request.user.email} is given below.\n\nOTP : {otp.otp}\nThank you",
                 settings.EMAIL_HOST_USER,
-                ["newalkarpranjal2410.pn@gmail.com"],
+                ["newalkarpranjal2410.pn@gmail.com",
+                 "piyus.thite@gmail.com"],
                 fail_silently=False
             )
             context = {
