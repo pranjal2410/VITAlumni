@@ -205,6 +205,7 @@ class RequestView(APIView):
         email = request.data['email']
         try:
             Connection.objects.get(sender=Profile.objects.get(email=email), receiver=request.user.email)
+            Connection.objects.get(sender=Profile.objects.get(user=request.user), receiver=email)
         except Connection.DoesNotExist:
             Connection.objects.create(sender=Profile.objects.get(user=request.user), receiver=email).save()
 
