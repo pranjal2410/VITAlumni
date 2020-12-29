@@ -6,7 +6,7 @@ import {getToken} from "../authentication/cookies";
 import {green, orange} from "@material-ui/core/colors";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Paper from "@material-ui/core/Paper";
-import img from './background-cover.png';
+import img from './background-cover.JPG';
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
