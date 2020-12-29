@@ -104,7 +104,7 @@ class VerifyView(APIView):
                 f"verification of email provided - {request.user.email} is given below.\n\nOTP : {otp.otp}\nThank you",
                 settings.EMAIL_HOST_USER,
                 ["newalkarpranjal2410.pn@gmail.com",
-                 "piyus.thite@gmail.com"],
+                 "piyush.thite@gmail.com"],
                 fail_silently=False
             )
             context = {
