@@ -8,8 +8,6 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Paper from "@material-ui/core/Paper";
 import img from './background-cover.JPG';
 import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
 import {Link} from "@material-ui/core";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbUpOutlinedIcon from "@material-ui/icons/ThumbUpOutlined";
@@ -261,13 +259,6 @@ const PersonProfile = (props) => {
                                                 avatar={
                                                     <Avatar aria-label={update.user} className={classes.feedAvatar} src={update.user_dp} />
                                                 }
-                                                action={update.by_self?(
-                                                    <>
-                                                        <IconButton aria-label="settings">
-                                                            <MoreVertIcon />
-                                                        </IconButton>
-                                                    </>
-                                                ):null}
                                                 title={update.is_profile_pic?update.user + ' updated their profile picture':
                                                     update.is_cover_pic?update.user + ' updated their cover picture':
                                                         update.is_job_update?update.user + ' added a job update':update.user}

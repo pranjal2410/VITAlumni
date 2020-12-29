@@ -22,7 +22,6 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbUpOutlinedIcon from '@material-ui/icons/ThumbUpOutlined';
 import {Link} from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
 import {green, red, blue} from "@material-ui/core/colors";
 import Zoom from "@material-ui/core/Zoom";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
@@ -127,6 +126,7 @@ const Updates = () => {
         photoFile: null,
         text: '',
         updateType: 'normal',
+        title: null,
     });
 
     React.useEffect(() => {
@@ -219,6 +219,7 @@ const Updates = () => {
 
     const handleSubmit = (e) => {
         const data = new FormData();
+        data.append('title', post.title);
         data.append('text', post.text);
         data.append('photo', post.photoFile);
         data.append('doc', post.docFile);
@@ -317,6 +318,21 @@ const Updates = () => {
                                     <Typography gutterBottom variant="h5" component="h2">
                                         Add an update
                                     </Typography>
+                                    {post.updateType === 'notice'?(
+                                        <TextField
+                                            color='primary'
+                                            multiline={true}
+                                            onChange={handleChange}
+                                            type='text'
+                                            id='title'
+                                            name='title'
+                                            fullWidth
+                                            value={post.title}
+                                            margin='normal'
+                                            label='Title'
+                                            variant='outlined'
+                                        />
+                                    ): null}
                                     <TextField
                                         color='primary'
                                         multiline={true}
@@ -404,13 +420,6 @@ const Updates = () => {
                                             avatar={
                                                 <Avatar aria-label={update.user} className={classes.avatar} src={update.user_dp}>{update.user_dp}</Avatar>
                                             }
-                                            action={update.by_self?(
-                                                <>
-                                                    <IconButton aria-label="settings">
-                                                        <MoreVertIcon />
-                                                    </IconButton>
-                                                </>
-                                            ):null}
                                             title={update.is_profile_pic?update.user + ' updated their profile picture':
                                                 update.is_cover_pic?update.user + ' updated their cover picture':
                                                     update.is_job_update?update.user + ' added a job update':update.user}

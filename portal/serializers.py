@@ -19,10 +19,11 @@ class BranchSerializer(serializers.ModelSerializer):
 class UpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Updates
-        fields = ['text', 'created_on', 'is_profile_pic', 'is_job_update', 'is_cover_pic', 'is_notice']
+        fields = ['title', 'text', 'created_on', 'is_profile_pic', 'is_job_update', 'is_cover_pic', 'is_notice']
 
     def create(self, validated_data):
         update = Updates.objects.create(
+            title=validated_data['title'],
             text=validated_data['text'],
             created_on=datetime.now(),
             is_profile_pic=validated_data['is_profile_pic'],
