@@ -60,29 +60,6 @@ class LoginView(APIView):
     permission_classes = [AllowAny, ]
 
     def post(self, request):
-        staff = ['shripad.bhatlawande@vit.edu',
-                 'swati.shilaskar@vit.edu',
-                 'shital.raut@vit.edu',
-                 'rupali.tornekar@vit.edu',
-                 'sunil.tayde@vit.edu',
-                 'ashwini.barbadekar@vit.edu',
-                 'joyti.madake@vit.edu',
-                 'suhas.bhise@vit.edu',
-                 'siddharth.bhorge@vit.edu',
-                 'mrunal.shidore@vit.edu',
-                 'abhay.chopde@vit.edu',
-                 'pooja.kulkarni@vit.edu',
-                 'milind.kamble@vit.edu',
-                 'vijay.mane@vit.edu',
-                 'bharat.taralekar@vit.edu',
-                 'medha.wyawahare@vit.edu',
-                 'milind.tirmare@vit.edu',
-                 'vaishali.jabade@vit.edu']
-        for email in staff:
-            try:
-                Profile.objects.get(email=email)
-            except Profile.DoesNotExist:
-                Profile.objects.create(email=email, is_college_staff=True).save()
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             profile = Profile.objects.get(email=serializer.data.get('email'))
