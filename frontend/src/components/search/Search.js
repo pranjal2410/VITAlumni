@@ -26,6 +26,17 @@ import CardContent from "@material-ui/core/CardContent";
 import {CardActions, CardMedia, Typography} from "@material-ui/core";
 import ClearIcon from '@material-ui/icons/Clear';
 import {ThemeContext} from "../../context/ThemeContext";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+
+const branches = [
+    "Computer Engineering",
+    "Electronics & Telecommunication Engineering",
+    "Mechanical Engineering",
+    "Instrumentation Engineering",
+    "Civil Engineering",
+    "Chemical Engineering"
+]
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -81,6 +92,17 @@ const Search = () => {
     const [search, setSearch] = React.useState('');
     const [people, setPeople] = React.useState([]);
     const [submitted, setSubmitted] = React.useState(false);
+    const [list, setList] = React.useState(null);
+    const [filter, setFilter] = React.useState('all')
+
+    const handleList = (e) => {
+        setList(e.currentTarget);
+    }
+    
+    const handleClick = (e) => {
+        setFilter(e.currentTarget.getAttribute('value'));
+        setList(null);
+    }
 
     const handleChange = (e) => {
         setSearch(e.target.value);
@@ -92,7 +114,8 @@ const Search = () => {
                 "Authorization": `Token ${getToken()}`,
             },
             data: {
-                'search': e.target.value
+                'search': e.target.value,
+                'filter': filter,
             },
             url: '/portal/get-people/'
         }).then(response => {
@@ -137,6 +160,7 @@ const Search = () => {
             },
             data: {
                 'search': search,
+                'filter': filter,
             },
             url: '/portal/get-people/',
         }).then(response => {
@@ -160,9 +184,23 @@ const Search = () => {
                 >
                     <img src={dark?logo:darkLogo} alt="BG" className={classes.img} />
                     <Paper className={classes.root} elevation={10}>
-                        <IconButton className={classes.iconButton} aria-label="menu">
+                        <IconButton className={classes.iconButton} aria-label="menu" onClick={handleList}>
                             <MenuIcon />
                         </IconButton>
+                        <Menu
+                            id="simple-menu"
+                            anchorEl={list}
+                            keepMounted
+                            open={Boolean(list)}
+                            onClose={() => setList(null)}
+                        >
+                            <MenuItem value='all' onClick={handleClick}>All</MenuItem>
+                            {branches.map((branch, i) => {
+                                return (
+                                    <MenuItem key={i} value={branch} onClick={handleClick}>{branch}</MenuItem>
+                                )
+                            })}
+                        </Menu>
                         <InputBase
                             fullWidth
                             id={'search'}

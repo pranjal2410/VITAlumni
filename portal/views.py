@@ -187,7 +187,7 @@ class SearchView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def post(self, request):
-        people = getPeople(request.data['search'], request.user)
+        people = getPeople(request.data['search'], request.user, request.data['filter'])
 
         context = {
             'people': people,
@@ -351,7 +351,7 @@ def getConnectionList(profile):
     return connection_list
 
 
-def getPeople(search, request_user):
+def getPeople(search, request_user, branch='all'):
     people = []
     if len(search.split(' ')) > 1:
         user_list = User.objects.filter(first_name__contains=search.split(' ')[0],
@@ -373,14 +373,28 @@ def getPeople(search, request_user):
                 except Connection.DoesNotExist:
                     is_approved = False
                     is_sent = False
-            people.append({
-                'email': user.email,
-                'name': user.first_name + ' ' + user.last_name,
-                'profile_pic': user.profile_pic.photo.url if user.profile_pic else None,
-                'is_approved': is_approved,
-                'is_sent': is_sent,
-                'slug': user.slug,
-            })
+            if branch != 'all':
+                try:
+                    Profile.objects.get(user=user, branch=Branch.objects.get(name=branch))
+                    people.append({
+                        'email': user.email,
+                        'name': user.first_name + ' ' + user.last_name,
+                        'profile_pic': user.profile_pic.photo.url if user.profile_pic else None,
+                        'is_approved': is_approved,
+                        'is_sent': is_sent,
+                        'slug': user.slug,
+                    })
+                except Profile.DoesNotExist:
+                    pass
+            else:
+                people.append({
+                    'email': user.email,
+                    'name': user.first_name + ' ' + user.last_name,
+                    'profile_pic': user.profile_pic.photo.url if user.profile_pic else None,
+                    'is_approved': is_approved,
+                    'is_sent': is_sent,
+                    'slug': user.slug,
+                })
 
     return people
 
