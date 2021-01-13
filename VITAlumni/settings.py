@@ -26,7 +26,7 @@ SECRET_KEY = 'j2*(+1^22k+-@6s&nn_s=xamaon!z4x#-+8g*2l&rq29bas=_%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
