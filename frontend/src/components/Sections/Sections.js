@@ -285,9 +285,7 @@ export default function Sections() {
         axios({
             method: "GET",
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
             },
             url: BASE_URL + '/portal/branch-list/',
         }).then(response => {
