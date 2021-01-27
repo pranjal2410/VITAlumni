@@ -113,6 +113,7 @@ class VerifyView(APIView):
             }
             return Response(context, status=status.HTTP_200_OK)
         except Exception as e:
+            print(e)
             context = {
                 'success': 'False',
                 'message': e,
