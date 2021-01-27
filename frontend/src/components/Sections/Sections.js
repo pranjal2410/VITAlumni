@@ -285,6 +285,7 @@ export default function Sections() {
             method: "GET",
             headers: {
                 "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*"
             },
             url: 'https://vit-alumni.herokuapp.com/portal/branch-list/',
         }).then(response => {
