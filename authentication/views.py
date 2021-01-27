@@ -115,7 +115,7 @@ class VerifyView(APIView):
         except Exception as e:
             context = {
                 'success': 'False',
-                'message': 'Could not send email. Please try again later',
+                'message': e,
             }
             return Response(context, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

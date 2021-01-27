@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "proxy": "https://vit-alumni.azurewebsites.net/",
+  "proxy": "https://vit-alumni.herokuapp.com/ ",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -22,7 +22,7 @@
     "jwt-decode": "^3.0.0",
     "material-auto-rotating-carousel": "^3.0.2",
     "moment": "^2.29.1",
-    "netlify-cli": "^2.69.11",
+    "netlify-cli": "^3.4.4",
     "notistack": "^1.0.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
