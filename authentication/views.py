@@ -116,7 +116,7 @@ class VerifyView(APIView):
             print(e)
             context = {
                 'success': 'False',
-                'message': e,
+                'message': 'Failed to login',
             }
             return Response(context, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
