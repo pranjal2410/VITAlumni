@@ -34,18 +34,19 @@ export const PendingRequests = ({ open, setOpen }) => {
     const [pending_list, setPending_list] = React.useState([]);
 
     React.useEffect(() => {
-        axios({
-            method: 'GET',
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Content-Type" : "application/json",
-                "Authorization": `Token ${getToken()}`,
-            },
-            url: BASE_URL + '/portal/get-pending-list/'
-        }).then(res => {
-            setPending_list(res.data.pending_list);
-        }).catch(err => {
-        });
+        if(getToken()) {
+            axios({
+                method: 'GET',
+                headers: {
+                    "Content-Type" : "application/json",
+                    "Authorization": `Token ${getToken()}`,
+                },
+                url: BASE_URL + '/portal/get-pending-list/'
+            }).then(res => {
+                setPending_list(res.data.pending_list);
+            }).catch(err => {
+            });
+        }
     }, [open])
 
     const handleClose = () => {
@@ -59,7 +60,6 @@ export const PendingRequests = ({ open, setOpen }) => {
         axios({
             method: 'POST',
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Content-Type" : "application/json",
                 "Authorization": `Token ${getToken()}`,
             },

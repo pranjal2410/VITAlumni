@@ -48,33 +48,34 @@ export const EditProfile = ({ open, setOpen }) => {
     });
 
     useEffect(() => {
-        axios({
-            method: 'GET',
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Content-Type" : "application/json",
-                "Authorization": `Token ${getToken()}`,
-            },
-            url: BASE_URL + '/portal/edit-profile/'
-        }).then(res => {
-            setValues({
-                first_name: res.data.user_data.first_name,
-                last_name: res.data.user_data.last_name,
-                contact: res.data.user_data.contact,
-                email: res.data.user_data.email,
-                graduation: res.data.user_data.graduation,
-                birthday: res.data.user_data.birthday
-            });
-            handleDateChange(new Date(res.data.user_data.birthday));
-            if(res.data.user_data.branch !== null)
-                setBranch(res.data.user_data.branch);
-            if(res.data.user_data.graduation !== null)
-                setGrad(new Date(res.data.user_data.graduation));
-            return true;
-        }).then(val => {
-            setSpinner(false);
-        }).catch(error => {
-        })
+        if(getToken()) {
+            axios({
+                method: 'GET',
+                headers: {
+                    "Content-Type" : "application/json",
+                    "Authorization": `Token ${getToken()}`,
+                },
+                url: BASE_URL + '/portal/edit-profile/'
+            }).then(res => {
+                setValues({
+                    first_name: res.data.user_data.first_name,
+                    last_name: res.data.user_data.last_name,
+                    contact: res.data.user_data.contact,
+                    email: res.data.user_data.email,
+                    graduation: res.data.user_data.graduation,
+                    birthday: res.data.user_data.birthday
+                });
+                handleDateChange(new Date(res.data.user_data.birthday));
+                if(res.data.user_data.branch !== null)
+                    setBranch(res.data.user_data.branch);
+                if(res.data.user_data.graduation !== null)
+                    setGrad(new Date(res.data.user_data.graduation));
+                return true;
+            }).then(val => {
+                setSpinner(false);
+            }).catch(error => {
+            })
+        }
     }, [open])
 
     const handleClose = () => {
@@ -103,7 +104,6 @@ export const EditProfile = ({ open, setOpen }) => {
             axios({
                 method: 'POST',
                 headers: {
-                    "Access-Control-Allow-Origin": "*",
                     "Content-Type" : "application/json",
                     "Authorization": `Token ${getToken()}`,
                 },

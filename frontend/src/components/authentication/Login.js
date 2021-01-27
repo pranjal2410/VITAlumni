@@ -61,7 +61,6 @@ export const Login = ({ open, setOpen, setOTP }) => {
             axios({
                 method: 'POST',
                 headers: {
-                    "Access-Control-Allow-Origin": "*",
                     "Content-Type" : "application/json"
                 },
                 data: {
@@ -87,7 +86,6 @@ export const Login = ({ open, setOpen, setOTP }) => {
                     axios({
                         method: 'GET',
                         headers: {
-                            "Access-Control-Allow-Origin": "*",
                             "Content-Type" : "application/json",
                             "Authorization": `Token ${getToken()}`,
                         },
