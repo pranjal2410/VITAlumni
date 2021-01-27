@@ -13,6 +13,7 @@ import axios from 'axios';
 import { useSnackbar } from "notistack";
 import {getToken, setCookie} from "./cookies";
 import {useHistory} from "react-router";
+import {BASE_URL} from "../../hosts";
 
 export const Login = ({ open, setOpen, setOTP }) => {
     const theme = useTheme();
@@ -67,7 +68,7 @@ export const Login = ({ open, setOpen, setOTP }) => {
                     email: values.email,
                     password: values.password
                 },
-                url: '/auth/login/'
+                url: BASE_URL + '/auth/login/'
             }).then(response => {
                 closeSnackbar('try_login')
                 setCookie(response.data.token, 'token');
@@ -90,7 +91,7 @@ export const Login = ({ open, setOpen, setOTP }) => {
                             "Content-Type" : "application/json",
                             "Authorization": `Token ${getToken()}`,
                         },
-                        url: '/auth/verify-otp/'
+                        url: BASE_URL + '/auth/verify-otp/'
                     }).then(response => {
                         closeSnackbar('send-otp')
                         enqueueSnackbar('OTP sent to your email Successfully!', {variant: 'success', key: 'success-send'})

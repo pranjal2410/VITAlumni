@@ -15,6 +15,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import NewsDialog from "./NewsDialog";
+import {BASE_URL} from "../../hosts";
 
 const slides = [
     { id: 0, url: logo, color: 'white' },
@@ -118,7 +119,7 @@ const Home = () => {
             headers: {
                 "Access-Control-Allow-Origin": "*",
             },
-            url: '/portal/home/'
+            url: BASE_URL + '/portal/home/'
         }).then(response => {
             setNews(response.data.notices)
         }).catch(error => {

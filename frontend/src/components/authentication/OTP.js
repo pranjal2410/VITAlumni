@@ -10,6 +10,7 @@ import { useSnackbar } from "notistack";
 import TextField from "@material-ui/core/TextField";
 import axios from 'axios';
 import {getToken} from "./cookies";
+import {BASE_URL} from "../../hosts";
 
 export const OTP = ({ open, setOpen, setLoggedIn }) => {
     const theme = useTheme();
@@ -36,7 +37,7 @@ export const OTP = ({ open, setOpen, setLoggedIn }) => {
                 "Content-Type" : "application/json",
                 Authorization: `Token ${getToken()}`,
             },
-            url: '/auth/verify-otp/'
+            url: BASE_URL + '/auth/verify-otp/'
         }).then(response => {
             closeSnackbar('resend')
             enqueueSnackbar('Resent Successfully!', {variant: 'success', key: 'success-resend'})
@@ -68,7 +69,7 @@ export const OTP = ({ open, setOpen, setLoggedIn }) => {
             data: {
                 otp: state.verify,
             },
-            url: '/auth/verify-otp/'
+            url: BASE_URL + '/auth/verify-otp/'
         }).then(response => {
             document.cookie = "verification=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             closeSnackbar('verification')

@@ -15,6 +15,7 @@ import Fade from "@material-ui/core/Fade";
 import TextField from "@material-ui/core/TextField";
 import DateFnsUtils from "@date-io/date-fns";
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import {BASE_URL} from "../../hosts";
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -94,7 +95,7 @@ const PersonProfile = (props) => {
             data: {
                 'slug': props.match.params.slug
             },
-            url: '/portal/view-profile/',
+            url: BASE_URL + '/portal/view-profile/',
         }).then(response => {
             setProfile(response.data.person_data)
             setFeed(response.data.feed_data)
@@ -121,7 +122,7 @@ const PersonProfile = (props) => {
             data: {
                 id: feed[i].id
             },
-            url: '/portal/greet/'
+            url: BASE_URL + '/portal/greet/'
         }).then(response => {
         }).catch(err => {
         })
@@ -141,7 +142,7 @@ const PersonProfile = (props) => {
             data: {
                 'email': profile.email
             },
-            url: '/portal/request-connect/'
+            url: BASE_URL + '/portal/request-connect/'
         }).then(res => {
         }).catch(error => {
         })
@@ -158,7 +159,7 @@ const PersonProfile = (props) => {
                     <Grid item xs={6}>
                         <Paper className={classes.bannerBackground} elevation={15} style={{ backgroundImage: profile.cover_pic?`url(${profile.cover_pic})`:`url(${img})`}}>
                             {profile.profile_pic?(
-                                <Avatar src={profile.profile_pic} alt={profile.name} className={classes.avatar}/>
+                                <Avatar src={BASE_URL + profile.profile_pic} alt={profile.name} className={classes.avatar}/>
                             ):(
                                 <Avatar className={classes.avatar}>{profile.name.slice(0,1)}</Avatar>
                             )}
@@ -271,7 +272,7 @@ const PersonProfile = (props) => {
                                                     <CardMedia
                                                         className={classes.photo}
                                                         component='img'
-                                                        image={update.photo}
+                                                        image={BASE_URL + update.photo}
                                                     />
                                                 ):null}
                                                 {update.doc?(

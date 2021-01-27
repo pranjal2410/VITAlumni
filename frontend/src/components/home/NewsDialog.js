@@ -5,6 +5,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {useTheme, makeStyles} from "@material-ui/core";
 import {Link} from "react-router-dom";
+import {BASE_URL} from "../../hosts";
 
 const useStyles = makeStyles(theme => ({
     photo: {
@@ -61,7 +62,7 @@ const NewsDialog = (props) => {
                             tabIndex={-1}
                             style={{ color: theme.palette.text.primary}}
                         >
-                            <img src={news.photo} className={classes.photo} alt=""/>
+                            <img src={BASE_URL + news.photo} className={classes.photo} alt=""/>
                         </DialogContentText>
                     ):null}
                     {news.doc?(
@@ -71,7 +72,7 @@ const NewsDialog = (props) => {
                             tabIndex={-1}
                             style={{ color: theme.palette.text.primary}}
                         >
-                            <Link to='#' className={classes.link} onClick={() => window.open('http://localhost:8000'+news.doc)}>Click here to download the document</Link>
+                            <Link to='#' className={classes.link} onClick={() => window.open(BASE_URL+news.doc)}>Click here to download the document</Link>
                         </DialogContentText>
                     ):null}
                 </DialogContent>

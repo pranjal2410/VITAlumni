@@ -14,6 +14,7 @@ import {DatePicker, KeyboardDatePicker, MuiPickersUtilsProvider} from "@material
 import DateFnsUtils from "@date-io/date-fns";
 import MenuItem from "@material-ui/core/MenuItem";
 import DialogContentText from "@material-ui/core/DialogContentText";
+import {BASE_URL} from "../../hosts";
 
 const branches = [
     "Computer Engineering",
@@ -113,7 +114,7 @@ export const SignUp = ({ open, setOpen, setOTP }) => {
                     graduation: grad.getUTCFullYear() + "-" + (grad.getUTCMonth()+1) + "-" + grad.getUTCDate(),
                     branch: values.branch
                 },
-                url: '/auth/register/'
+                url: BASE_URL + '/auth/register/'
             }).then(response => {
                 closeSnackbar('try_signUp')
                 setCookie(response.data.token, 'token');
@@ -132,7 +133,7 @@ export const SignUp = ({ open, setOpen, setOTP }) => {
                         "Content-Type" : "application/json",
                         "Authorization": `Token ${getToken()}`,
                     },
-                    url: '/auth/verify-otp/'
+                    url: BASE_URL + '/auth/verify-otp/'
                 }).then(response => {
                     closeSnackbar('send-otp')
                     enqueueSnackbar('OTP sent to your email Successfully!', {variant: 'success', key: 'success-send'})

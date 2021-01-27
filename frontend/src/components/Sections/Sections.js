@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
+import {BASE_URL} from '../../hosts';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -285,9 +286,8 @@ export default function Sections() {
             method: "GET",
             headers: {
                 "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "*"
             },
-            url: 'https://vit-alumni.herokuapp.com/portal/branch-list/',
+            url: BASE_URL + '/portal/branch-list/',
         }).then(response => {
             setRows(response.data.branches);
         })

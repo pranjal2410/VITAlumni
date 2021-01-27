@@ -15,6 +15,7 @@ import useTheme from "@material-ui/core/styles/useTheme";
 import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {BASE_URL} from "../../hosts";
 
 const branches = [
     "Computer Engineering",
@@ -54,7 +55,7 @@ export const EditProfile = ({ open, setOpen }) => {
                 "Content-Type" : "application/json",
                 "Authorization": `Token ${getToken()}`,
             },
-            url: '/portal/edit-profile/'
+            url: BASE_URL + '/portal/edit-profile/'
         }).then(res => {
             setValues({
                 first_name: res.data.user_data.first_name,
@@ -115,7 +116,7 @@ export const EditProfile = ({ open, setOpen }) => {
                     'branch': branch,
                     'graduation': grad.getUTCFullYear() + "-" + (grad.getUTCMonth()+1) + "-" + grad.getUTCDate(),
                 },
-                url: '/portal/edit-profile/'
+                url: BASE_URL + '/portal/edit-profile/'
             }).then(response => {
                 closeSnackbar('try_edit')
                 setErrors({...errors, editError: false});

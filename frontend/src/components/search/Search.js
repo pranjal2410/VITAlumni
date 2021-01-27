@@ -28,6 +28,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import {ThemeContext} from "../../context/ThemeContext";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import {BASE_URL} from "../../hosts";
 
 const branches = [
     "Computer Engineering",
@@ -117,7 +118,7 @@ const Search = () => {
                 'search': e.target.value,
                 'filter': filter,
             },
-            url: '/portal/get-people/'
+            url: BASE_URL + '/portal/get-people/'
         }).then(response => {
             setPeople(response.data.people)
         }).catch(error => {
@@ -138,7 +139,7 @@ const Search = () => {
             data: {
                 'email': people[i].email
             },
-            url: '/portal/request-connect/'
+            url: BASE_URL + '/portal/request-connect/'
         }).then(res => {
         }).catch(error => {
         })
@@ -160,7 +161,7 @@ const Search = () => {
                 'search': search,
                 'filter': filter,
             },
-            url: '/portal/get-people/',
+            url: BASE_URL + '/portal/get-people/',
         }).then(response => {
             setPeople(response.data.people);
             return true;
@@ -223,7 +224,7 @@ const Search = () => {
                                     return (
                                         <ListItem key={i}>
                                             <ListItemAvatar>
-                                                <Avatar aria-label={person.name} className={classes.avatar} src={person.profile_pic}>{person.name.slice(0,1)}</Avatar>
+                                                <Avatar aria-label={person.name} className={classes.avatar} src={BASE_URL + person.profile_pic}>{person.name.slice(0,1)}</Avatar>
                                             </ListItemAvatar>
                                             <ListItemText primary={person.name}/>
                                             <ListItemSecondaryAction>
@@ -264,7 +265,7 @@ const Search = () => {
                                             {person.profile_pic?(
                                                 <CardMedia
                                                     className={classes.media}
-                                                    image={person.profile_pic}
+                                                    image={BASE_URL + person.profile_pic}
                                                     component='img'
                                                     title={person.name}
                                                 />

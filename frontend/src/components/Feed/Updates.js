@@ -35,6 +35,7 @@ import List from "@material-ui/core/List";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {Grow} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem";
+import {BASE_URL} from "../../hosts";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -137,7 +138,7 @@ const Updates = () => {
                 "Content-Type" : "application/json",
                 "Authorization": `Token ${getToken()}`,
             },
-            url: '/portal/updates/',
+            url: BASE_URL + '/portal/updates/',
         }).then(response => {
             setSubmit(false);
             setSpinner(false);
@@ -236,7 +237,7 @@ const Updates = () => {
                 "Authorization": `Token ${getToken()}`,
             },
             data: data,
-            url: '/portal/updates/'
+            url: BASE_URL + '/portal/updates/'
         }).then(response => {
             setPost({
                 ...post,
@@ -269,7 +270,7 @@ const Updates = () => {
             data: {
                 id: feed[i].id
             },
-            url: '/portal/greet/'
+            url: BASE_URL + '/portal/greet/'
         }).then(response => {
         }).catch(err => {
         })
@@ -288,7 +289,7 @@ const Updates = () => {
                             {profile.profile_pic?(
                                 <CardMedia
                                     className={classes.media}
-                                    image={profile.profile_pic}
+                                    image={BASE_URL + profile.profile_pic}
                                     component='img'
                                     title={profile.name}
                                 />
@@ -435,7 +436,7 @@ const Updates = () => {
                                                 <CardMedia
                                                     className={classes.photo}
                                                     component='img'
-                                                    image={update.photo}
+                                                    image={BASE_URL + update.photo}
                                                 />
                                             ):null}
                                             {update.doc?(

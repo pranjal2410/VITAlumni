@@ -19,6 +19,7 @@ import Avatar from "@material-ui/core/Avatar";
 import CheckCircleOutlineRoundedIcon from '@material-ui/icons/CheckCircleOutlineRounded';
 import CheckCircleRoundedIcon from '@material-ui/icons/CheckCircleRounded';
 import DialogContentText from "@material-ui/core/DialogContentText";
+import {BASE_URL} from "../../hosts";
 
 const useStyles = makeStyles(theme => ({
     avatar: {
@@ -40,7 +41,7 @@ export const PendingRequests = ({ open, setOpen }) => {
                 "Content-Type" : "application/json",
                 "Authorization": `Token ${getToken()}`,
             },
-            url: '/portal/get-pending-list/'
+            url: BASE_URL + '/portal/get-pending-list/'
         }).then(res => {
             setPending_list(res.data.pending_list);
         }).catch(err => {
@@ -65,7 +66,7 @@ export const PendingRequests = ({ open, setOpen }) => {
             data: {
                 email: pending_list[i].email,
             },
-            url: '/portal/get-pending-list/'
+            url: BASE_URL + '/portal/get-pending-list/'
         }).then(res => {
         }).catch(err => {
         })
@@ -86,7 +87,7 @@ export const PendingRequests = ({ open, setOpen }) => {
                             return (
                                 <ListItem key={i}>
                                     <ListItemAvatar>
-                                        <Avatar aria-label={request.name} className={classes.avatar} src={request.profile_pic}>V</Avatar>
+                                        <Avatar aria-label={request.name} className={classes.avatar} src={BASE_URL + request.profile_pic}>V</Avatar>
                                     </ListItemAvatar>
                                     <ListItemText primary={request.name}/>
                                     <ListItemSecondaryAction>
