@@ -1,1 +1,2 @@
 web: gunicorn VITAlumni.wsgi
+release: python manage.py runserver
