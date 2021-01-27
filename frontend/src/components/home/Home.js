@@ -118,6 +118,7 @@ const Home = () => {
             method: "GET",
             headers: {
                 "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
             },
             url: BASE_URL + '/portal/home/'
         }).then(response => {

@@ -286,6 +286,7 @@ export default function Sections() {
             method: "GET",
             headers: {
                 "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
             },
             url: BASE_URL + '/portal/branch-list/',
         }).then(response => {
