@@ -97,7 +97,6 @@ const UserProfile = () => {
             setFeed(response.data.feed_data)
             setSpinner(false);
         }).catch(err => {
-            console.log(err.response.data)
         })
     }, [spinner])
 
@@ -122,7 +121,6 @@ const UserProfile = () => {
             url: '/portal/greet/'
         }).then(response => {
         }).catch(err => {
-            console.log(err.response.data)
         })
     }
 

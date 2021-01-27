@@ -121,7 +121,6 @@ const Search = () => {
         }).then(response => {
             setPeople(response.data.people)
         }).catch(error => {
-            console.log(error)
         })
     }
 
@@ -142,7 +141,6 @@ const Search = () => {
             url: '/portal/request-connect/'
         }).then(res => {
         }).catch(error => {
-            console.log(error);
         })
     }
 
@@ -169,7 +167,6 @@ const Search = () => {
         }).then(res => {
             setSubmitted(true);
         }).catch(err => {
-            console.log(err);
         })
     }
 

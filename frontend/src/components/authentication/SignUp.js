@@ -261,7 +261,6 @@ export const SignUp = ({ open, setOpen, setOTP }) => {
                                 margin="normal"
                                 onClick={() => {
                                     setStage(stage+1);
-                                    console.log(values);
                                 }}
                                 variant="contained"
                                 color='primary'

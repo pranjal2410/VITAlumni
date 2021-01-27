@@ -44,7 +44,6 @@ export const PendingRequests = ({ open, setOpen }) => {
         }).then(res => {
             setPending_list(res.data.pending_list);
         }).catch(err => {
-            console.log(err);
         });
     }, [open])
 
@@ -69,7 +68,6 @@ export const PendingRequests = ({ open, setOpen }) => {
             url: '/portal/get-pending-list/'
         }).then(res => {
         }).catch(err => {
-            console.log(err);
         })
     }
 

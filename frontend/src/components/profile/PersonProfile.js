@@ -100,7 +100,6 @@ const PersonProfile = (props) => {
             setFeed(response.data.feed_data)
             setSpinner(false);
         }).catch(err => {
-            console.log(err.response.data)
         })
     }, [spinner, props])
 
@@ -125,7 +124,6 @@ const PersonProfile = (props) => {
             url: '/portal/greet/'
         }).then(response => {
         }).catch(err => {
-            console.log(err.response.data)
         })
     }
 
@@ -146,7 +144,6 @@ const PersonProfile = (props) => {
             url: '/portal/request-connect/'
         }).then(res => {
         }).catch(error => {
-            console.log(error);
         })
     }
 

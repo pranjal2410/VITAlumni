@@ -73,7 +73,6 @@ export const EditProfile = ({ open, setOpen }) => {
         }).then(val => {
             setSpinner(false);
         }).catch(error => {
-            console.log(error);
         })
     }, [open])
 

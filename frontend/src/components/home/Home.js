@@ -123,7 +123,6 @@ const Home = () => {
         }).then(response => {
             setNews(response.data.notices)
         }).catch(error => {
-            console.log(error)
         })
     }, [])
 
