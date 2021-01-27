@@ -119,7 +119,7 @@ const Home = () => {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type" : "application/json",
             },
-            url: '/portal/home/'
+            url: 'https://vit-alumni.herokuapp.com/portal/home/'
         }).then(response => {
             setNews(response.data.notices)
         }).catch(error => {

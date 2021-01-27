@@ -287,7 +287,7 @@ export default function Sections() {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type" : "application/json"
             },
-            url: '/portal/branch-list/',
+            url: 'https://vit-alumni.herokuapp.com/portal/branch-list/',
         }).then(response => {
             setRows(response.data.branches);
         })
