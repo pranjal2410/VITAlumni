@@ -33,7 +33,6 @@ export const OTP = ({ open, setOpen, setLoggedIn }) => {
         axios({
             method: 'GET',
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Content-Type" : "application/json",
                 Authorization: `Token ${getToken()}`,
             },
@@ -62,7 +61,6 @@ export const OTP = ({ open, setOpen, setLoggedIn }) => {
         axios({
             method: 'post',
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Content-Type" : "application/json",
                 "Authorization": `Token ${getToken()}`,
             },

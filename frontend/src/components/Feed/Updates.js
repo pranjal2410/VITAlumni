@@ -134,7 +134,6 @@ const Updates = () => {
         axios({
             method: 'GET',
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Content-Type" : "application/json",
                 "Authorization": `Token ${getToken()}`,
             },
@@ -232,7 +231,6 @@ const Updates = () => {
         axios({
             method: 'post',
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Content-Type" : "multipart/from-data",
                 "Authorization": `Token ${getToken()}`,
             },
@@ -263,7 +261,6 @@ const Updates = () => {
         axios({
             method: 'POST',
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Content-Type" : "application/json",
                 "Authorization": `Token ${getToken()}`,
             },

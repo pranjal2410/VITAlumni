@@ -89,7 +89,6 @@ const UserProfile = () => {
         axios({
             method: "GET",
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Authorization": `Token ${getToken()}`,
             },
             url: BASE_URL + '/portal/user-profile/',
@@ -112,7 +111,6 @@ const UserProfile = () => {
         axios({
             method: 'POST',
             headers: {
-                "Access-Control-Allow-Origin": "*",
                 "Content-Type" : "application/json",
                 "Authorization": `Token ${getToken()}`,
             },
